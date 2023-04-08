@@ -2,7 +2,7 @@ import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import '../constant/colors.dart';
+import '../res/colors.dart';
 
 class Utilis {
   static double averageRating(List<int> rating) {
@@ -24,7 +24,7 @@ class Utilis {
         msg: message, backgroundColor: BC.login, textColor: Colors.white);
   }
 
-  static flushbar_message(BuildContext context, String message) {
+  static error_flushbar_message(BuildContext context, String message) {
     Flushbar(
       message: message,
       title: 'FLushBar',
@@ -38,6 +38,25 @@ class Utilis {
       borderRadius: BorderRadius.circular(8),
       animationDuration: const Duration(seconds: 1),
       icon: const Icon(Icons.error, color: Colors.white),
+      forwardAnimationCurve: Curves.decelerate,
+      reverseAnimationCurve: Curves.fastOutSlowIn,
+    ).show(context);
+  }
+
+  static submitted_flushbar_message(BuildContext context, String message) {
+    Flushbar(
+      message: message,
+      title: 'FLushBar',
+      titleColor: Colors.white,
+      backgroundColor: BC.login,
+      flushbarStyle: FlushbarStyle.FLOATING,
+      flushbarPosition: FlushbarPosition.BOTTOM,
+      margin: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.all(20),
+      duration: const Duration(seconds: 3),
+      borderRadius: BorderRadius.circular(8),
+      animationDuration: const Duration(seconds: 1),
+      icon: const Icon(Icons.done, color: Colors.white),
       forwardAnimationCurve: Curves.decelerate,
       reverseAnimationCurve: Curves.fastOutSlowIn,
     ).show(context);

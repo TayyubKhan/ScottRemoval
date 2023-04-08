@@ -8,6 +8,7 @@ import 'package:scotremovals/view/comment_View.dart';
 import 'package:scotremovals/view/signature_view.dart';
 import 'package:scotremovals/view/waiverForm_View.dart';
 
+import '../../temp.dart';
 import '../../view/Home_Screen.dart';
 import '../../view/Login_screenView.dart';
 import '../../view/order_detail_view.dart';
@@ -24,7 +25,7 @@ class Routes {
             builder: (BuildContext context) => const SplashView());
       case RoutesName.home:
         return MaterialPageRoute(
-            builder: (BuildContext context) => const Home_screen_View());
+            builder: (BuildContext context) => Home_screen_View());
       case RoutesName.singleOrder:
         return MaterialPageRoute(
             builder: (BuildContext context) => const Order_Detail());
@@ -49,6 +50,9 @@ class Routes {
       case RoutesName.addFloors:
         return MaterialPageRoute(
             builder: (BuildContext context) => Add_Floor_View());
+      case RoutesName.test:
+        return MaterialPageRoute(
+            builder: (BuildContext context) => MapScreen());
       default:
         return MaterialPageRoute(builder: (_) {
           return const Scaffold(

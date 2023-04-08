@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:scotremovals/res/app_url.dart';
+import 'package:scotremovals/utils/Routes/routes_name.dart';
+import 'package:scotremovals/utils/utilis.dart';
+import 'package:scotremovals/view_model/dataViewModel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import '../constant/colors.dart';
+import '../repository/waiver_Form_repo.dart';
 import '../res/Components/Rounded_Button.dart';
+import '../res/colors.dart';
+import '../view_model/auth_view_model.dart';
 
 class Waiver_Form_View extends StatefulWidget {
   @override
@@ -9,6 +17,9 @@ class Waiver_Form_View extends StatefulWidget {
 }
 
 class _Waiver_Form_ViewState extends State<Waiver_Form_View> {
+  Waive_Form_Repository wf = Waive_Form_Repository();
+  DataViewViewModel data = DataViewViewModel();
+  TextEditingController _controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height * 1;
@@ -68,6 +79,7 @@ class _Waiver_Form_ViewState extends State<Waiver_Form_View> {
                       height: 20,
                     ),
                     TextFormField(
+                      controller: _controller,
                       keyboardType: TextInputType.name,
                       maxLines: 10,
                       style: TextStyle(
@@ -83,11 +95,33 @@ class _Waiver_Form_ViewState extends State<Waiver_Form_View> {
                       height: height * 0.33,
                     ),
                     Center(
-                      child: Rounded_Button2(
-                          width: width * 0.9,
-                          height: height * 1,
-                          title: "DONE",
-                          onPress: () {}),
+                      child: Consumer<AuthViewModelProvider>(
+                        builder: (BuildContext context, value, child) {
+                          return Rounded_Button2(
+                              width: width * 0.9,
+                              height: height * 1,
+                              title: "DONE",
+                              loading: value.loading,
+                              onPress: () async {
+                                SharedPreferences sp =
+                                    await SharedPreferences.getInstance();
+                                if (_controller.text.isNotEmpty) {
+                                  wf.waiverFormApi(
+                                      context,
+                                      AppUrl.waiverFormApiEndPoint,
+                                      _controller.toString(),
+                                      sp.get('id').toString());
+                                  Navigator.pushNamed(
+                                      context, RoutesName.signature);
+                                  value.setLoading(
+                                      value.setLoading(!value.loading));
+                                } else {
+                                  Utilis.error_flushbar_message(
+                                      context, 'Please Enter Form');
+                                }
+                              });
+                        },
+                      ),
                     ),
                     const SizedBox(height: 40),
                   ],

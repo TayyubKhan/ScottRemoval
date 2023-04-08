@@ -13,11 +13,11 @@ class Row_Component extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(string1,
-            style:
-                const TextStyle(fontWeight: FontWeight.w500, color: textcolor)),
+            style: const TextStyle(
+                fontWeight: FontWeight.w500, color: BC.textcolor)),
         Text(
           string2,
-          style: const TextStyle(color: textcolor),
+          style: const TextStyle(color: BC.textcolor),
         )
       ],
     );

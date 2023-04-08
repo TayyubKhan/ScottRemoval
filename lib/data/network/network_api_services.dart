@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../app_exception.dart';
 import 'base_apiservices.dart';
@@ -10,10 +11,16 @@ import 'base_apiservices.dart';
 class Netwrok_API_Services extends Base_API_Services {
   @override
   Future getGetAPI_services(String url) async {
+    SharedPreferences sp = await SharedPreferences.getInstance();
     dynamic responseJSon;
     try {
-      final response =
-          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+      final response = await http
+          .get(
+            Uri.parse(url),
+          )
+          .timeout(
+            const Duration(seconds: 10),
+          );
       responseJSon = return_response(response);
     } on SocketException {
       throw FetchDataException('No Internet Connectivity');
@@ -26,7 +33,10 @@ class Netwrok_API_Services extends Base_API_Services {
     dynamic responseJSon;
     try {
       final response = await http
-          .post(Uri.parse(url), body: data)
+          .post(
+            Uri.parse(url),
+            body: data,
+          )
           .timeout(const Duration(seconds: 10));
       responseJSon = return_response(response);
     } on SocketException {
@@ -51,9 +61,17 @@ class Netwrok_API_Services extends Base_API_Services {
     }
   }
 
-  @override
-  Future getPostAPI_serviceswithdata(String url, data) {
-    // TODO: implement getPostAPI_serviceswithdata
-    throw UnimplementedError();
+  dynamic return_responseforformdata(dynamic response) async {
+    switch (response.statuscode) {
+      case 200:
+        dynamic jsonResponse =
+            json.decode(await response.stream.bytesToString());
+        return jsonResponse;
+      case 404:
+        throw UnauthorizedException(response.body.toString());
+      default:
+        throw FetchDataException(
+            'Error occurred while communicating with servers');
+    }
   }
 }

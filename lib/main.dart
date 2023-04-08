@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:scotremovals/temp.dart';
+import 'package:scotremovals/utils/Routes/routes.dart';
+import 'package:scotremovals/utils/Routes/routes_name.dart';
+import 'package:scotremovals/view_model/AdditemsViewVIewModel.dart';
+import 'package:scotremovals/view_model/FloorViewVIewModel.dart';
 import 'package:scotremovals/view_model/auth_view_model.dart';
+import 'package:scotremovals/view_model/dataViewModel.dart';
 import 'package:scotremovals/view_model/user_view_model.dart';
 
 void main() {
@@ -18,15 +22,18 @@ class MyApp extends StatelessWidget {
         providers: [
           ChangeNotifierProvider(create: (_) => AuthViewModelProvider()),
           ChangeNotifierProvider(create: (_) => UserViewModel()),
+          ChangeNotifierProvider(create: (_) => DataViewViewModel()),
+          ChangeNotifierProvider(create: (_) => ItemViewViewModel()),
+          ChangeNotifierProvider(create: (_) => FloorModel()),
         ],
         child: MaterialApp(
           title: 'Flutter Demo',
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
-          home: const API_Testing(),
-          // initialRoute: RoutesName.login,
-          //  onGenerateRoute: Routes.Generate_Routes,
+          // home: API_Testing()
+          initialRoute: RoutesName.splash,
+          onGenerateRoute: Routes.Generate_Routes,
         ));
   }
 }

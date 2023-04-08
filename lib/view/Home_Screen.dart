@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:scotremovals/utils/Routes/routes_name.dart';
+import 'package:scotremovals/model/WonJobModel.dart';
+import 'package:scotremovals/repository/home_repo.dart';
+import 'package:scotremovals/view_model/dataViewModel.dart';
 
-import '../constant/colors.dart';
-import '../data/response/status.dart';
-import '../view_model/home_view_model.dart';
+import '../res/Components/myDrawer.dart';
+import '../res/colors.dart';
+import '../utils/Routes/routes_name.dart';
 import '../view_model/user_view_model.dart';
-import '../widgets/myDrawer.dart';
 
 // ignore: camel_case_types
 class Home_screen_View extends StatefulWidget {
@@ -17,312 +18,209 @@ class Home_screen_View extends StatefulWidget {
 }
 
 class _Home_screen_ViewState extends State<Home_screen_View> {
-  HomeViewViewModel homeViewViewModel = HomeViewViewModel();
+  HomeRepository homeRepository = HomeRepository();
   @override
-  void initState() {
-    homeViewViewModel.fetchOrderListApi(context);
-    super.initState();
+  int selectedIndex = 0;
+  Future<void> fetchData() async {
+    homeRepository.fetchData(context);
   }
 
-  int selectedIndex = 0;
+  Future<void> _refreshData() async {
+    try {
+      await fetchData();
+    } catch (error) {
+      // Handle the error here
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error: $error'),
+      ));
+    }
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
+    final dvv = Provider.of<DataViewViewModel>(context);
     final GlobalKey<ScaffoldState> _scaffold = GlobalKey<ScaffoldState>();
     var height = MediaQuery.of(context).size.height * 1;
     var width = MediaQuery.of(context).size.width * 1;
     final Userprefrences = Provider.of<UserViewModel>(context);
-    return Scaffold(
-      key: _scaffold,
-      drawer: MyDrawer(),
-      appBar: AppBar(
-        toolbarHeight: height * 0.08,
-        leading: IconButton(
-            onPressed: () {
-              _scaffold.currentState?.openDrawer();
-            },
-            icon: const Icon(Icons.menu, size: 32)),
-        title: const Text(
-          'My Orders',
-          style: TextStyle(
-              fontSize: 24, fontFamily: "HelveticaBold", color: BC.white),
-        ),
-        centerTitle: true,
-        actions: const [
-          Icon(
-            Icons.search,
-            color: BC.white,
-          ),
-          SizedBox(
-            width: 20,
-          ),
-        ],
-      ),
-      body: ChangeNotifierProvider<HomeViewViewModel>(
-        create: (BuildContext context) => homeViewViewModel,
-        child: Consumer<HomeViewViewModel>(
-          builder: (BuildContext context, value, _) {
-            switch (value.Order_List.status!) {
-              case Status.LOADING:
-                return const CircularProgressIndicator();
-              case Status.ERROR:
-                return Text(value.Order_List.message.toString());
-              case Status.COMPLETED:
-                return ListView.builder(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  itemCount: value.Order_List.data!.orderCount,
-                  itemBuilder: ((context, index) {
-                    return Column(
-                      children: [
-                        InkWell(
-                          onTap: () {
-                            setState(() {
-                              selectedIndex = index;
-                            });
-                            Navigator.pushNamed(
-                                context, RoutesName.singleOrder);
-                          },
-                          child: SizedBox(
-                            width: width,
-                            height: 90,
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 8,
-                                  decoration: BoxDecoration(
-                                      color: selectedIndex == index
-                                          ? BC.green
-                                          : BC.white,
-                                      borderRadius: BorderRadius.circular(5)),
-                                ),
-                                Container(
-                                  width: width * 0.96,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 5),
-                                  child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+    return WillPopScope(
+      onWillPop: () async {
+        // Return true to allow back navigation, or false to disable it
+        return false;
+      },
+      child: RefreshIndicator(
+        onRefresh: _refreshData,
+        child: Scaffold(
+            key: _scaffold,
+            drawer: MyDrawer(),
+            appBar: AppBar(
+              backgroundColor: BC.login,
+              toolbarHeight: height * 0.08,
+              leading: IconButton(
+                  onPressed: () {
+                    _scaffold.currentState?.openDrawer();
+                  },
+                  icon: const Icon(Icons.menu, size: 32)),
+              title: Text(
+                'My Orders',
+                style: TextStyle(
+                    fontSize: width * 0.067,
+                    fontFamily: "HelveticaBold",
+                    color: BC.white),
+              ),
+              centerTitle: true,
+              actions: [
+                const Icon(
+                  Icons.search,
+                  color: BC.white,
+                ),
+                SizedBox(
+                  width: width * 0.047,
+                ),
+              ],
+            ),
+            body: FutureBuilder<WonJobModel>(
+                future: homeRepository.fetchData(context),
+                builder: (BuildContext context, snapshot) {
+                  if (snapshot.hasData) {
+                    return ListView.builder(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      itemCount: snapshot.data!.orderCount,
+                      itemBuilder: ((context, index) {
+                        return Column(
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                setState(() {
+                                  selectedIndex = index;
+                                });
+                                String desc =
+                                    '${snapshot.data!.data![index].orderType.toString()}(est. ${snapshot.data!.data![index].productVolume.toString()},${snapshot.data!.data![index].persons.toString()} men)';
+                                dvv.setData([
+                                  snapshot.data!.data![index].deliveryAddress
+                                      .toString(),
+                                  desc.toString(),
+                                  snapshot.data!.data![index].id.toString(),
+                                  index.toString()
+                                ]);
+                                Navigator.pushNamed(
+                                    context, RoutesName.singleOrder);
+                              },
+                              child: SizedBox(
+                                width: width,
+                                height: height * 0.1,
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 8,
+                                      decoration: BoxDecoration(
+                                          color: selectedIndex == index
+                                              ? BC.green
+                                              : BC.white,
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
+                                    ),
+                                    Container(
+                                      width: width * 0.96,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 5),
+                                      child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            const Text(
-                                              '#12345',
-                                              style: TextStyle(
-                                                fontFamily: "HelveticaRegular",
-                                                color: BC.lightGrey,
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  snapshot.data!.data![index]
+                                                      .orderId
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                    fontFamily:
+                                                        "HelveticaRegular",
+                                                    color: BC.lightGrey,
+                                                    fontSize: width * 0.038,
+                                                  ),
+                                                ),
+                                                Container(
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
                                                       horizontal: 10,
                                                       vertical: 5),
-                                              decoration: BoxDecoration(
-                                                  color: BC.green,
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          15)),
-                                              child: const Center(
+                                                  decoration: BoxDecoration(
+                                                      color: BC.green,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              15)),
+                                                  child: Center(
+                                                    child: Text(
+                                                      snapshot
+                                                          .data!
+                                                          .data![index]
+                                                          .orderStatus
+                                                          .toString(),
+                                                      style: TextStyle(
+                                                          color: BC.white,
+                                                          fontSize:
+                                                              width * 0.036),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Expanded(
+                                              child: Container(
+                                                padding: const EdgeInsets.only(
+                                                    right: 10),
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
                                                 child: Text(
-                                                  'Picked',
+                                                  snapshot.data!.data![index]
+                                                      .deliveryAddress
+                                                      .toString(),
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                   style: TextStyle(
-                                                      color: BC.white,
-                                                      fontSize: 12),
+                                                    fontFamily: "HelveticaBold",
+                                                    color: Colors.black,
+                                                    fontSize: width * 0.05,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                          ],
-                                        ),
-                                        Expanded(
-                                          child: Container(
-                                            padding: const EdgeInsets.only(
-                                                right: 10),
-                                            width: MediaQuery.of(context)
-                                                .size
-                                                .width,
-                                            child: Text(
-                                              '19 Kingshill Avenue, Glasgow, Lanarkshire, G68 9NF, United Kingdom',
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
+                                            Text(
+                                              // 'Home Removals (est. 15.12 m3, 2 men)',
+                                              '${snapshot.data!.data![index].orderType.toString()}(est. ${snapshot.data!.data![index].productVolume.toString()} m3,${snapshot.data!.data![index].persons.toString()} men)',
                                               style: TextStyle(
-                                                fontFamily: "HelveticaBold",
+                                                fontFamily: "HelveticaRegular",
                                                 color: Colors.black,
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.w600,
+                                                fontSize: width * 0.036,
                                               ),
                                             ),
-                                          ),
-                                        ),
-                                        const Text(
-                                          'Home Removals (est. 15.12 m3, 2 men)',
-                                          style: TextStyle(
-                                            fontFamily: "HelveticaRegular",
-                                            color: Colors.black,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ]),
+                                          ]),
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ),
-                        const Divider(
-                          thickness: 2,
-                        )
-                      ],
+                            const Divider(
+                              thickness: 2,
+                            )
+                          ],
+                        );
+                      }),
                     );
-                  }),
-                );
-            }
-          },
-        ),
+                  }
+                  return Container(
+                      child: Center(child: const CircularProgressIndicator()));
+                })),
       ),
     );
   }
 }
-
-// return Scaffold(
-//     backgroundColor: const Color(0xff263238),
-//     appBar: AppBar(
-//       backgroundColor: primarycolor,
-//       automaticallyImplyLeading: false,
-//       centerTitle: true,
-//       title: const Text(
-//         "Movies List",
-//         style: TextStyle(color: textcolor),
-//       ),
-//       actions: [
-//         InkWell(
-//           onTap: () {
-//             Userprefrences.remove();
-//           },
-//           child: const Center(child: Text("Logout")),
-//         )
-//       ],
-//     ),
-//     body: SafeArea(
-//       child: ChangeNotifierProvider<HomeViewViewModel>(
-//         create: (BuildContext context) => homeViewViewModel,
-//         child: Consumer<HomeViewViewModel>(builder: (context, value, _) {
-//           switch (value.moviesList.status!) {
-//             case Status.LOADING:
-//               return const CircularProgressIndicator();
-//             case Status.ERROR:
-//               return Text(value.moviesList.message.toString());
-//             case Status.COMPLETED:
-//               return ListView.builder(
-//                   scrollDirection: Axis.horizontal,
-//                   itemCount: value.moviesList.data!.movies!.length,
-//                   itemBuilder: (context, index) {
-//                     return Padding(
-//                       padding: const EdgeInsets.all(22),
-//                       child: Container(
-//                         width: width,
-//                         height: height,
-//                         child: Column(
-//                           children: [
-//                             Image.network(
-//                                 fit: BoxFit.contain,
-//                                 width: 500,
-//                                 height: 350,
-//                                 value.moviesList.data!.movies![index]
-//                                     .posterurl!
-//                                     .toString(),
-//                                 errorBuilder: (context, error, stack) {
-//                               return const Icon(
-//                                 size: 100,
-//                                 Icons.error,
-//                                 color: Colors.red,
-//                               );
-//                             }),
-//                             SizedBox(
-//                               height: height * 0.01,
-//                             ),
-//                             Text(
-//                                 value.moviesList.data!.movies![index].title!
-//                                     .toString(),
-//                                 style: const TextStyle(
-//                                     fontWeight: FontWeight.bold,
-//                                     fontSize: 30,
-//                                     color: textcolor)),
-//                             SizedBox(
-//                               height: height * 0.01,
-//                             ),
-//                             Row_Component(
-//                                 string1: "Genre:    ",
-//                                 string2: value
-//                                     .moviesList.data!.movies![index].genres!
-//                                     .toString()),
-//                             SizedBox(
-//                               height: height * 0.01,
-//                             ),
-//                             Row_Component(
-//                                 string1: "Actors:   ",
-//                                 string2: value
-//                                     .moviesList.data!.movies![index].actors!
-//                                     .toString()),
-//                             SizedBox(
-//                               height: height * 0.01,
-//                             ),
-//                             Row_Component(
-//                                 string1: "Release Date:   ",
-//                                 string2: value.moviesList.data!
-//                                     .movies![index].releaseDate!
-//                                     .toString()),
-//                             SizedBox(
-//                               height: height * 0.01,
-//                             ),
-//                             Row(
-//                               children: [
-//                                 const Text("Story Line:  ",
-//                                     style: TextStyle(
-//                                         fontWeight: FontWeight.w500,
-//                                         color: textcolor)),
-//                                 Flexible(
-//                                     child: Text(
-//                                   value.moviesList.data!.movies![index]
-//                                       .storyline!
-//                                       .toString(),
-//                                   style: const TextStyle(color: textcolor),
-//                                 )),
-//                                 SizedBox(
-//                                   height: height * 0.01,
-//                                 ),
-//                               ],
-//                             ),
-//                             SizedBox(
-//                               height: height * 0.01,
-//                             ),
-//                             Row(
-//                               children: [
-//                                 const Text('Rating:    ',
-//                                     style: TextStyle(
-//                                         fontWeight: FontWeight.w500,
-//                                         color: textcolor)),
-//                                 Text(
-//                                     Utilis.averageRating(value.moviesList
-//                                             .data!.movies![index].ratings!)
-//                                         .toStringAsFixed(1),
-//                                     style:
-//                                         const TextStyle(color: textcolor)),
-//                                 const Text("\\ 10",
-//                                     style: TextStyle(color: textcolor)),
-//                                 const Icon(
-//                                   Icons.star_outlined,
-//                                   color: Colors.yellow,
-//                                 )
-//                               ],
-//                             )
-//                           ],
-//                         ),
-//                       ),
-//                     );
-//                   });
-//           }
-//           return Container();
-//         }),
-//       ),
-//     ));

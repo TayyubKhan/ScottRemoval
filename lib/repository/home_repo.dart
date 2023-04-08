@@ -1,24 +1,41 @@
-import 'package:scotremovals/model/Won_job_Model.dart';
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:scotremovals/model/WonJobModel.dart';
+import 'package:scotremovals/utils/utilis.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../data/network/base_apiservices.dart';
 import '../data/network/network_api_services.dart';
 import '../res/app_url.dart';
 
 class HomeRepository {
-  Base_API_Services _apiservices = Netwrok_API_Services();
+  Netwrok_API_Services _apiservices = Netwrok_API_Services();
 
-  Future<WonJOB_Model> fetch_home_api() async {
+  Future<WonJobModel> fetchData(BuildContext context) async {
     SharedPreferences sp = await SharedPreferences.getInstance();
+    var jsonResponse;
     try {
-      dynamic response =
-          await _apiservices.getPostAPI_services(AppUrl.winJobsApiEndPoint, {
-        "api-key": AppUrl.API_key,
-        "login_token": "b1d5781111d84f7b3fe45a0852e59758cd7a87e5"
+      var request =
+          http.MultipartRequest('POST', Uri.parse(AppUrl.winJobsApiEndPoint));
+      request.headers.addAll({
+        'Cookie': sp.getString('cookie').toString(),
+        'Cache-Control': 'no-cache',
+        'Postman-Token': '<calculated when request is sent>',
       });
-      return response = WonJOB_Model.fromJson(response);
+      request.fields['api-key'] = AppUrl.API_key;
+      request.fields['login_token'] = sp.get('login_token').toString();
+      var response = await request.send();
+      jsonResponse = json.decode(await response.stream.bytesToString());
+      if (response.statusCode == 200) {
+        return WonJobModel.fromJson(jsonResponse);
+      } else {
+        return Utilis.error_flushbar_message(context, 'Oops');
+      }
     } catch (e) {
-      throw e;
+      return Utilis.error_flushbar_message(context, e.toString());
     }
+
+    // prints "John Doe"// prints "johndoe@example.com"
   }
 }

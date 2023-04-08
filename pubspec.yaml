@@ -42,7 +42,11 @@ dependencies:
   shared_preferences:
   flutter_slider_drawer: any
   http_parser:
-  mime: ^1.0.4
+  syncfusion_flutter_signaturepad: ^21.1.37
+  camera: ^0.10.3+2
+  image_picker: ^0.8.7+1
+  url_launcher: ^6.1.10
+  google_maps_flutter: ^2.2.5
 dev_dependencies:
   flutter_test:
     sdk: flutter

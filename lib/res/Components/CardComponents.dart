@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../constant/colors.dart';
+import '../colors.dart';
 
 class Card_Components extends StatelessWidget {
   final VoidCallback onPress;

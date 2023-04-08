@@ -1,11 +1,11 @@
-class WonJOB_Model {
+class WonJobModel {
   int? status;
   int? orderCount;
   List<Data>? data;
 
-  WonJOB_Model({this.status, this.orderCount, this.data});
+  WonJobModel({this.status, this.orderCount, this.data});
 
-  WonJOB_Model.fromJson(Map<String, dynamic> json) {
+  WonJobModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
     orderCount = json['order_count'];
     if (json['data'] != null) {
@@ -115,8 +115,8 @@ class Data {
   Null? dropCountry;
   Null? orderPickupPhone1;
   Null? orderDropPhone1;
-  Null? signature;
-  Null? signaturePath;
+  String? signature;
+  String? signaturePath;
 
   Data(
       {this.id,

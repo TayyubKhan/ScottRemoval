@@ -1,7 +1,16 @@
-import 'package:flutter/material.dart';
+import 'dart:ui';
 
-import '../constant/colors.dart';
-import '../screens/addPhoto.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:scotremovals/utils/Routes/routes_name.dart';
+import 'package:scotremovals/view_model/auth_view_model.dart';
+import 'package:scotremovals/view_model/dataViewModel.dart';
+import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
+
+import '../repository/signature_repo.dart';
+import '../res/Components/Rounded_Button.dart';
+import '../res/colors.dart';
 
 class Signature_View extends StatefulWidget {
   @override
@@ -9,8 +18,14 @@ class Signature_View extends StatefulWidget {
 }
 
 class _Signature_ViewState extends State<Signature_View> {
+  SignatureRepo signatureRepo = SignatureRepo();
+  final GlobalKey<SfSignaturePadState> _signaturePadKey = GlobalKey();
+  String _responseMessage = '';
+  DataViewViewModel data = DataViewViewModel();
   @override
   Widget build(BuildContext context) {
+    var height = MediaQuery.of(context).size.height * 1;
+    var width = MediaQuery.of(context).size.width * 1;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: BC.blue,
@@ -18,7 +33,7 @@ class _Signature_ViewState extends State<Signature_View> {
             onPressed: () {
               Navigator.pop(context);
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.arrow_back_ios,
               color: BC.white,
             )),
@@ -26,71 +41,91 @@ class _Signature_ViewState extends State<Signature_View> {
           'Ask For Signature',
           style: TextStyle(
             color: BC.white,
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
+            fontSize: width * 0.067,
+            fontFamily: "HelveticaBold",
           ),
         ),
         centerTitle: true,
       ),
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
-            Text(
+            const Text(
               'Please sign below to acknowledge receipt of item/s specified on your Booking Conformation.',
               style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
-            Text(
-              'Clear Signature',
-              style: TextStyle(
-                  fontWeight: FontWeight.w600, fontSize: 15, color: BC.blue),
+            InkWell(
+              onTap: () {
+                _signaturePadKey.currentState!.clear();
+              },
+              child: const Text(
+                'Clear Signature',
+                style: TextStyle(
+                    fontWeight: FontWeight.w600, fontSize: 15, color: BC.blue),
+              ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
-            TextFormField(
-              keyboardType: TextInputType.name,
-              maxLines: 6,
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-              )),
-            ),
-            Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => AddPhoto(),
-                    ));
-                  },
-                  child: Container(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 130, vertical: 15),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        color: BC.blue),
-                    child: Text(
-                      'DONE',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600),
+            Container(
+              height: height * 0.6,
+              width: width,
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.grey,
+                        ),
+                      ),
+                      child: SfSignaturePad(
+                        key: _signaturePadKey,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(
+                    height: 20,
+                  ),
+                ],
+              ),
             ),
-            SizedBox(height: 40),
+            const Spacer(),
+            Center(
+              child: Consumer<AuthViewModelProvider>(
+                builder: (context, value, child) {
+                  return Rounded_Button2(
+                    width: width * 0.9,
+                    height: height * 1,
+                    loading: value.loading,
+                    title: "DONE",
+                    onPress: () async {
+                      final signatureData =
+                          await _signaturePadKey.currentState?.toImage();
+                      final bytes = await signatureData?.toByteData(
+                          format: ImageByteFormat.png);
+                      final Uint8List pngBytes = bytes!.buffer.asUint8List();
+                      if (signatureRepo.signatureAPI(
+                              context, data.data[3], pngBytes) ==
+                          true) {
+                        value.setLoading(value.setLoading(!value.loading));
+                        Navigator.pushNamed(context, RoutesName.comment);
+                      }
+                    },
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 40),
           ],
         ),
       ),

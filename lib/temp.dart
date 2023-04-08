@@ -1,68 +1,92 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'package:scotremovals/res/Components/Rounded_Button.dart';
 
-class API_Testing extends StatefulWidget {
-  const API_Testing({Key? key}) : super(key: key);
-
+class MapScreen extends StatefulWidget {
   @override
-  State<API_Testing> createState() => _API_TestingState();
+  _MapScreenState createState() => _MapScreenState();
 }
 
-class _API_TestingState extends State<API_Testing> {
+class _MapScreenState extends State<MapScreen> {
+  final double startLat = 51.5072178;
+  final double startLng = -0.1275862;
+  final double destLat = 55.864237;
+  final double destLng = 4.251806;
+  Completer<GoogleMapController> _controller = Completer();
+  Set<Marker> _markers = {};
+  List<LatLng> _routeCoords = [];
+
   @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Center(
-        child: Rounded_Button(
-          title: 'Button',
-          onPress: () {
-            postData();
-          },
-        ),
+  void initState() {
+    super.initState();
+    _markers.add(
+      Marker(
+        markerId: MarkerId('start'),
+        position: LatLng(startLat, startLng),
+        infoWindow: InfoWindow(title: 'Starting Location'),
       ),
     );
-  }
-}
-
-Future<void> postData() async {
-  final String apiUrl = 'https://scot.adroitsol.co/api/v1/Order/won_jobs';
-  final String apiKey = '0kks8oswoksockoo4csg0cc44k8s4gw40s04448o0';
-  final String loginToken = 'ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4';
-
-  // create the request body as a Map object
-  final Map<String, dynamic> requestBody = {
-    'api_key': apiKey,
-    'login_token': loginToken,
-    // add any additional data here as needed
-  };
-
-  // encode the request body as JSON
-  final String jsonBody = jsonEncode(requestBody);
-
-  try {
-    // make the API request
-    final http.Response response = await http.post(
-      Uri.parse(apiUrl),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonBody,
+    _markers.add(
+      Marker(
+        markerId: MarkerId('dest'),
+        position: LatLng(destLat, destLng),
+        infoWindow: InfoWindow(title: 'Destination'),
+      ),
     );
+    _getRouteCoords();
+  }
 
-    // handle the response
-    if (response.statusCode == 200) {
-      // request succeeded, parse the response JSON
-      final dynamic responseData = jsonDecode(response.body);
-      // do something with the response data
-    } else {
-      // request failed
-      throw Exception('Failed to load data');
-    }
-  } catch (e) {
-    // handle any errors that occurred during the request
-    print('Error occurred: $e');
+  void _getRouteCoords() async {
+    // Make API call to get route coordinates
+    // This example uses the Google Maps Directions API
+
+    // Construct the URL for the API call
+    String url =
+        'https://maps.googleapis.com/maps/api/directions/json?origin=${startLat},${startLng}&destination=${destLat},${destLng}&key=AIzaSyDVhiVLwbhFVV2I6mNZf8kqScTjffv4eR0';
+
+    // Make the API call and parse the response
+    // This example uses the http package
+    final response = await http.get(Uri.parse(url));
+    final data = json.decode(response.body);
+    List<LatLng> coords = [];
+    data['routes'][0]['legs'][0]['steps'].forEach((step) {
+      coords.add(
+          LatLng(step['end_location']['lat'], step['end_location']['lng']));
+    });
+    setState(() {
+      _routeCoords = coords;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    CameraPosition initialPosition = CameraPosition(
+      target: LatLng(startLat, startLng),
+      zoom: 10,
+    );
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Map Screen'),
+      ),
+      body: GoogleMap(
+        mapType: MapType.normal,
+        markers: _markers,
+        polylines: {
+          Polyline(
+            polylineId: PolylineId('route'),
+            points: _routeCoords,
+            color: Colors.blue,
+            width: 5,
+          ),
+        },
+        initialCameraPosition: initialPosition,
+        onMapCreated: (GoogleMapController controller) {
+          _controller.complete(controller);
+        },
+      ),
+    );
   }
 }

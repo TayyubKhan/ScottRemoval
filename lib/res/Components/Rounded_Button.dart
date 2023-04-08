@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../constant/colors.dart';
 import '../colors.dart';
 
 class Rounded_Button extends StatelessWidget {
@@ -28,7 +27,7 @@ class Rounded_Button extends StatelessWidget {
           child: Center(
               child: loading
                   ? const CircularProgressIndicator(
-                      color: BC.login,
+                      color: BC.white,
                     )
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -38,7 +37,8 @@ class Rounded_Button extends StatelessWidget {
                         ),
                         Text(title,
                             style: const TextStyle(
-                                color: textcolor, fontFamily: "HelveticaBold")),
+                                color: BC.textcolor,
+                                fontFamily: "HelveticaBold")),
                         const Icon(
                           Icons.login_sharp,
                           color: Colors.white,
@@ -76,12 +76,12 @@ class Rounded_Button2 extends StatelessWidget {
           child: Center(
             child: loading
                 ? const CircularProgressIndicator(
-                    color: BC.login,
+                    color: BC.white,
                   )
                 : Center(
                     child: Text(title,
                         style: const TextStyle(
-                            color: textcolor,
+                            color: BC.textcolor,
                             fontSize: 18,
                             fontFamily: "HelveticaBold")),
                   ),

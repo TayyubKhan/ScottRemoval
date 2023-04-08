@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:scotremovals/res/Components/Rounded_Button.dart';
+import 'package:scotremovals/utils/Routes/routes_name.dart';
 
-import '../constant/colors.dart';
+import '../res/colors.dart';
 
 class ItemsAndFloorView extends StatelessWidget {
   @override
@@ -36,72 +37,94 @@ class ItemsAndFloorView extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Text(
-                      'Additional Items',
-                      style: TextStyle(
-                          fontFamily: "HelveticaRegular",
-                          fontSize: width * 0.04),
-                    ),
-                  ],
-                ),
-                const Image(
-                  image: AssetImage('assets/addMenu.png'),
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            const Divider(
-              thickness: 2,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Additional Floors',
-                  style: TextStyle(
-                      fontFamily: "HelveticaRegular", fontSize: width * 0.04),
-                ),
-                const Image(
-                  image: AssetImage('assets/floors.png'),
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            const Divider(
-              thickness: 2,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Other Additions',
-                  style: TextStyle(
-                      fontFamily: "HelveticaRegular", fontSize: width * 0.04),
+                InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, RoutesName.addItems);
+                  },
+                  child: Row(
+                    children: [
+                      Text(
+                        'Additional Items',
+                        style: TextStyle(
+                            fontFamily: "HelveticaRegular",
+                            fontSize: width * 0.04),
+                      ),
+                    ],
+                  ),
                 ),
                 InkWell(
-                  onTap: () {},
-                  child: const CircleAvatar(
-                    backgroundColor: BC.login,
-                    child: Center(
-                        child: Icon(
-                      Icons.add,
-                      color: Colors.white,
-                    )),
+                  onTap: () {
+                    Navigator.pushNamed(context, RoutesName.addItems);
+                  },
+                  child: const Image(
+                    image: AssetImage('assets/addMenu.png'),
                   ),
-                )
+                ),
               ],
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            const Divider(
+              thickness: 2,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.pushNamed(context, RoutesName.addFloors);
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Additional Floors',
+                    style: TextStyle(
+                        fontFamily: "HelveticaRegular", fontSize: width * 0.04),
+                  ),
+                  const Image(
+                    image: AssetImage('assets/floors.png'),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            const Divider(
+              thickness: 2,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.pushNamed(context, RoutesName.addFloors);
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Other Additions',
+                    style: TextStyle(
+                        fontFamily: "HelveticaRegular", fontSize: width * 0.04),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(context, RoutesName.singleOrder);
+                    },
+                    child: const CircleAvatar(
+                      backgroundColor: BC.login,
+                      child: Center(
+                          child: Icon(
+                        Icons.add,
+                        color: Colors.white,
+                      )),
+                    ),
+                  )
+                ],
+              ),
             ),
             const SizedBox(
               height: 10,
@@ -130,7 +153,9 @@ class ItemsAndFloorView extends StatelessWidget {
                 width: width * 0.8,
                 height: height * 1,
                 title: "DONE",
-                onPress: () {}),
+                onPress: () {
+                  Navigator.pushNamed(context, RoutesName.photo);
+                }),
             const SizedBox(height: 20),
           ],
         ),
