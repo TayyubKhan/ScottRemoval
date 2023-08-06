@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -6,8 +8,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../res/app_url.dart';
 import '../utils/utilis.dart';
+import '../view_model/auth_view_model.dart';
 
 class CommentRepo {
+  AuthViewModelProvider myrepo = AuthViewModelProvider();
+
   Future<bool> CommentAPI(BuildContext context, String orderId, String userId,
       String driverId, String message) async {
     SharedPreferences sp = await SharedPreferences.getInstance();
@@ -29,15 +34,19 @@ class CommentRepo {
 
       var response = await request.send().timeout(const Duration(seconds: 10));
       dynamic jsonResponse = json.decode(await response.stream.bytesToString());
-
-      if (response.statusCode == 200) {
-        Utilis.submitted_flushbar_message(context, "Submitted");
+      print(jsonResponse);
+      if (jsonResponse["status"] == 200) {
+        Utilis.Snackbar_Message(context, "Success");
+        myrepo.setLoading(false);
         return true;
       } else {
-        Utilis.error_flushbar_message(context, "Oops...");
+        Utilis.Snackbar_ErrorMessage(context, "Oops...");
+        myrepo.setLoading(false);
         return false;
       }
     } catch (e) {
+      Utilis.Snackbar_ErrorMessage(context, e.toString());
+      myrepo.setLoading(false);
       return false;
     }
     // prints "John Doe"// prints "johndoe@example.com"

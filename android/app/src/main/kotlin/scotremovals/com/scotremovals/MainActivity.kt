@@ -1,4 +1,4 @@
-package scotremovals.com.scotremovals
+package scot.adroitsol.co
 
 import io.flutter.embedding.android.FlutterActivity
 

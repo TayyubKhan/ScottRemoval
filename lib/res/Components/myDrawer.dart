@@ -4,7 +4,6 @@ import 'package:scotremovals/res/Components/Call_and_Message.dart';
 import 'package:scotremovals/res/Components/Drawer_comp.dart';
 import 'package:scotremovals/utils/Routes/routes_name.dart';
 import 'package:scotremovals/utils/utilis.dart';
-import 'package:scotremovals/view_model/dataViewModel.dart';
 import 'package:scotremovals/view_model/user_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -37,8 +36,9 @@ class _MyDrawerState extends State<MyDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    var height = MediaQuery.of(context).size.height * 1;
+    var width = MediaQuery.of(context).size.width * 1;
     Calland_message cm = Calland_message();
-    final data = Provider.of<DataViewViewModel>(context);
     final user = Provider.of<UserViewModel>(context);
 
     return Drawer(
@@ -70,7 +70,8 @@ class _MyDrawerState extends State<MyDrawer> {
             child: Column(
               children: [
                 Drawer_ROW(
-                  icon: const ImageIcon(
+                  icon: ImageIcon(
+                    size: height * 0.04,
                     AssetImage('assets/go.png'),
                     color: Colors.white,
                   ),
@@ -82,9 +83,6 @@ class _MyDrawerState extends State<MyDrawer> {
                 const SizedBox(
                   height: 10,
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
                 const Divider(
                   thickness: 2,
                 ),
@@ -92,7 +90,8 @@ class _MyDrawerState extends State<MyDrawer> {
                   height: 10,
                 ),
                 Drawer_ROW(
-                  icon: const ImageIcon(
+                  icon: ImageIcon(
+                    size: height * 0.04,
                     AssetImage('assets/call.png'),
                     color: Colors.white,
                   ),
@@ -111,7 +110,8 @@ class _MyDrawerState extends State<MyDrawer> {
                   height: 10,
                 ),
                 Drawer_ROW(
-                  icon: const ImageIcon(
+                  icon: ImageIcon(
+                    size: height * 0.04,
                     AssetImage('assets/comment.png'),
                     color: Colors.white,
                   ),
@@ -130,7 +130,8 @@ class _MyDrawerState extends State<MyDrawer> {
                   height: 10,
                 ),
                 Drawer_ROW(
-                  icon: const ImageIcon(
+                  icon: ImageIcon(
+                    size: height * 0.04,
                     AssetImage('assets/history.png'),
                     color: Colors.white,
                   ),
@@ -147,7 +148,8 @@ class _MyDrawerState extends State<MyDrawer> {
                   height: 10,
                 ),
                 Drawer_ROW(
-                  icon: const ImageIcon(
+                  icon: ImageIcon(
+                    size: height * 0.04,
                     AssetImage('assets/send.png'),
                     color: Colors.white,
                   ),
@@ -166,7 +168,8 @@ class _MyDrawerState extends State<MyDrawer> {
                   height: 10,
                 ),
                 Drawer_ROW(
-                  icon: const ImageIcon(
+                  icon: ImageIcon(
+                    size: height * 0.04,
                     AssetImage('assets/set.png'),
                     color: Colors.white,
                   ),
@@ -186,8 +189,9 @@ class _MyDrawerState extends State<MyDrawer> {
                   height: 10,
                 ),
                 Drawer_ROW(
-                  icon: const ImageIcon(
-                    AssetImage('assets/about.png'),
+                  icon: ImageIcon(
+                    size: height * 0.04,
+                    AssetImage('assets/performence.png'),
                     color: Colors.white,
                   ),
                   title: 'Preferences',
@@ -200,7 +204,8 @@ class _MyDrawerState extends State<MyDrawer> {
                   thickness: 2,
                 ),
                 Drawer_ROW(
-                  icon: const ImageIcon(
+                  icon: ImageIcon(
+                    size: height * 0.04,
                     AssetImage('assets/about.png'),
                     color: Colors.white,
                   ),
@@ -220,7 +225,8 @@ class _MyDrawerState extends State<MyDrawer> {
                   height: 30,
                 ),
                 Drawer_ROW(
-                  icon: const ImageIcon(
+                  icon: ImageIcon(
+                    size: height * 0.04,
                     AssetImage('assets/logout.png'),
                     color: Colors.white,
                   ),

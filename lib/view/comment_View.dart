@@ -1,13 +1,15 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:scotremovals/repository/comment_repo.dart';
-import 'package:scotremovals/utils/Routes/routes_name.dart';
 import 'package:scotremovals/utils/utilis.dart';
 import 'package:scotremovals/view_model/auth_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../res/Components/Rounded_Button.dart';
 import '../res/colors.dart';
+import '../utils/Routes/routes_name.dart';
 
 class Comment_View extends StatefulWidget {
   @override
@@ -22,91 +24,101 @@ class _Comment_ViewState extends State<Comment_View> {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height * 1;
     var width = MediaQuery.of(context).size.width * 1;
-    return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: height * 0.08,
-        backgroundColor: BC.blue,
-        leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(
-              Icons.arrow_back_ios,
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pushNamed(context, RoutesName.singleOrder);
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          toolbarHeight: height * 0.08,
+          backgroundColor: BC.blue,
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pushNamed(context, RoutesName.singleOrder);
+              },
+              icon: const Icon(
+                Icons.arrow_back_ios,
+                color: BC.white,
+              )),
+          title: Text(
+            'Add Comment',
+            style: TextStyle(
               color: BC.white,
-            )),
-        title: Text(
-          'Add Comment',
-          style: TextStyle(
-            color: BC.white,
-            fontSize: width * 0.067,
-            fontFamily: "HelveticaBold",
+              fontSize: width * 0.067,
+              fontFamily: "HelveticaBold",
+            ),
           ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 20,
-            ),
-            TextFormField(
-              keyboardType: TextInputType.text,
-              maxLines: 10,
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: width * 0.048,
-                fontFamily: "HelveticaRegular",
+        body: Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 20,
               ),
-              decoration: InputDecoration(
-                  hintText: 'Add Comment.....',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  )),
-            ),
-            const Spacer(),
-            Center(
-              child: Semantics(
-                button: true,
-                child: Consumer<AuthViewModelProvider>(
-                  builder: (BuildContext context, value, Widget? child) {
-                    return Rounded_Button2(
-                        width: width * 0.9,
-                        height: height * 1,
-                        title: "DONE",
-                        loading: value.loading,
-                        onPress: () async {
-                          SharedPreferences sp =
-                              await SharedPreferences.getInstance();
-
-                          if (_controller.toString().isNotEmpty) {
-                            if (commentRepo.CommentAPI(
-                                    context,
-                                    sp.get('id').toString(),
-                                    '593',
-                                    sp.getString('driver').toString(),
-                                    _controller.toString()) ==
-                                true) {
-                              value
-                                  .setLoading(value.setLoading(!value.loading));
-                              Navigator.pushNamed(
-                                  context, RoutesName.singleOrder);
+              TextFormField(
+                controller: _controller,
+                keyboardType: TextInputType.text,
+                maxLines: 10,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: width * 0.048,
+                  fontFamily: "HelveticaRegular",
+                ),
+                decoration: InputDecoration(
+                    hintText: 'Add Comment.....',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    )),
+              ),
+              const Spacer(),
+              Center(
+                child: Semantics(
+                  button: true,
+                  child: Consumer<AuthViewModelProvider>(
+                    builder: (BuildContext context, value, Widget? child) {
+                      return Rounded_Button2(
+                          width: width * 0.9,
+                          height: height * 1,
+                          title: "DONE",
+                          loading: value.loading,
+                          onPress: () async {
+                            SharedPreferences sp =
+                                await SharedPreferences.getInstance();
+                            if (_controller.text.isNotEmpty) {
+                              value.setLoading(true);
+                              dynamic valid = await commentRepo.CommentAPI(
+                                      context,
+                                      sp.get('id').toString(),
+                                      '593',
+                                      sp.getString('driver').toString(),
+                                      _controller.toString())
+                                  .onError((error, stackTrace) =>
+                                      Utilis.error_flushbar_message(
+                                          context, error.toString()));
+                              value.setLoading(false);
+                              if (valid == true) {
+                                Navigator.pushNamed(
+                                    context, RoutesName.singleOrder);
+                              }
+                            } else {
+                              Utilis.error_flushbar_message(
+                                  context, 'Kindly Comment Us');
+                              value.setLoading(false);
                             }
-                          } else {
-                            Utilis.error_flushbar_message(
-                                context, 'Kindly Comment Us');
-                          }
 
-                          ;
-                        });
-                  },
+                            ;
+                          });
+                    },
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 40),
-          ],
+              const SizedBox(height: 40),
+            ],
+          ),
         ),
       ),
     );

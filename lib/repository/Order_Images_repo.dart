@@ -4,14 +4,12 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:scotremovals/data/network/network_api_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../res/app_url.dart';
 import '../utils/utilis.dart';
 
 class OrderImages {
-  Netwrok_API_Services _apiservices = Netwrok_API_Services();
   Future<bool> sendOrderImages(
       BuildContext context, List<File> imageFiles, String? orderId) async {
     SharedPreferences sp = await SharedPreferences.getInstance();
@@ -49,14 +47,17 @@ class OrderImages {
       final responseData = await response.stream.bytesToString();
       dynamic jsonResponse = json.decode(responseData);
       if (jsonResponse['status'] == 200) {
-        Utilis.submitted_flushbar_message(context, 'Submitted Successfully');
+        // ignore: use_build_context_synchronously
+        Utilis.Snackbar_Message(context, 'Submitted Successfully');
         return true;
       } else {
-        Utilis.error_flushbar_message(context, 'Try again');
+        // ignore: use_build_context_synchronously
+        Utilis.Snackbar_ErrorMessage(context, 'Try again');
         return false;
       }
     } catch (e) {
-      Utilis.error_flushbar_message(context, e.toString());
+      // ignore: use_build_context_synchronously
+      Utilis.Snackbar_ErrorMessage(context, e.toString());
       return false;
     }
   }

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:scotremovals/view_model/dataViewModel.dart';
@@ -35,6 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
     obsecureText.dispose();
   }
 
+  @override
   @override
   Widget build(BuildContext context) {
     final dataa = Provider.of<DataViewViewModel>(context);
@@ -181,16 +184,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                     "password":
                                         _passwordcontroller.text.toString()
                                   };
-
                                   gettingData();
                                   fk.fetchCookieAndLoginToken();
+                                  // ignore: use_build_context_synchronously
                                   authviewmodelprovider.loginApi(context, data);
                                   dataa.setData2([
                                     sp.getString('email').toString(),
                                     sp.getString('name').toString(),
                                     sp.getString('photo').toString()
                                   ]);
-                                  print(dataa.data2);
                                   value.setLoading(
                                       value.setLoading(!value.loading));
                                 }

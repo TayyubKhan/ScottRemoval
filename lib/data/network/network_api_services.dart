@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../app_exception.dart';
 import 'base_apiservices.dart';
@@ -11,7 +10,6 @@ import 'base_apiservices.dart';
 class Netwrok_API_Services extends Base_API_Services {
   @override
   Future getGetAPI_services(String url) async {
-    SharedPreferences sp = await SharedPreferences.getInstance();
     dynamic responseJSon;
     try {
       final response = await http

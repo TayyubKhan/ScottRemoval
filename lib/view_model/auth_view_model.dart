@@ -11,6 +11,12 @@ import '../utils/Routes/routes_name.dart';
 import '../utils/utilis.dart';
 
 class AuthViewModelProvider with ChangeNotifier {
+  bool _show = false;
+  bool get show => _show;
+  void showed() {
+    _show = !_show;
+  }
+
   DataViewViewModel dataview = DataViewViewModel();
   bool _loading = false;
   bool get loading => _loading;

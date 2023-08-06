@@ -1,20 +1,19 @@
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../data/network/network_api_services.dart';
 import '../res/app_url.dart';
 
 class Fetch_cookie_and_LoginToken {
-  Netwrok_API_Services _apiservices = Netwrok_API_Services();
   void fetchCookieAndLoginToken() async {
     String? loginToken;
     SharedPreferences sp = await SharedPreferences.getInstance();
+    print(sp.get('email').toString());
     final response = await http.post(
       Uri.parse(AppUrl.loginApiEndPoint),
       body: {
         "api-key": AppUrl.API_key,
-        "username": "ebad.connect@gmail.com",
-        "password": "123456"
+        "username": sp.get('email').toString(),
+        "password": sp.get('password').toString()
       },
     ).then((value) {
       loginToken = value.body.split(',')[2];

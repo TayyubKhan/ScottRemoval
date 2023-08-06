@@ -1,5 +1,5 @@
 class AppUrl {
-  static var baseUrl = 'https://scot.adroitsol.co/api/v1/';
+  static var baseUrl = 'https://scotremovals.com/api/v1/';
   static var loginApiEndPoint = '${baseUrl}auth/login';
   static var winJobsApiEndPoint = '${baseUrl}Order/won_jobs';
   static var orderDetailsEndPoint = "${baseUrl}Order/order_details";
@@ -15,5 +15,7 @@ class AppUrl {
   static var clientsDetailsApiEndPoint = '${baseUrl}User/get_client_details';
   static var driverDetailsApiEndPoint = '${baseUrl}User/get_driver_details';
   static var pricesWithSlug = '${baseUrl}Order/get_prices_with_slug';
+  static var dropout = '${baseUrl}order/update_drop_status';
+  static var pickup = '${baseUrl}order/update_pickup_status';
   static var API_key = '0kks8oswoksockoo4csg0cc44k8s4gw40s04448o';
 }

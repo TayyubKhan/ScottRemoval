@@ -27,7 +27,6 @@ class Utilis {
   static error_flushbar_message(BuildContext context, String message) {
     Flushbar(
       message: message,
-      title: 'FLushBar',
       titleColor: Colors.white,
       backgroundColor: Colors.red,
       flushbarStyle: FlushbarStyle.FLOATING,
@@ -46,7 +45,6 @@ class Utilis {
   static submitted_flushbar_message(BuildContext context, String message) {
     Flushbar(
       message: message,
-      title: 'FLushBar',
       titleColor: Colors.white,
       backgroundColor: BC.login,
       flushbarStyle: FlushbarStyle.FLOATING,
@@ -63,7 +61,14 @@ class Utilis {
   }
 
   static void Snackbar_Message(BuildContext context, String message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(backgroundColor: BC.blue, content: Text(message)));
+  }
+
+  static void Snackbar_ErrorMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        duration: const Duration(seconds: 3),
+        backgroundColor: Colors.red,
+        content: Text(message)));
   }
 }

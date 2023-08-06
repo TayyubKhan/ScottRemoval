@@ -1,6 +1,10 @@
 import 'package:flutter/foundation.dart';
 
 class DataViewViewModel with ChangeNotifier {
+  bool _status = true;
+  int _index = 0;
+  int get index => _index;
+  bool get status => _status;
   List<String> _data = [];
   List<String> _data2 = [];
   int _price = 0;
@@ -14,6 +18,21 @@ class DataViewViewModel with ChangeNotifier {
     return _data;
   }
 
+  void setStatus(bool Status) {
+    _status = Status;
+    notifyListeners();
+  }
+
+  void setIndex(index) {
+    _index = index;
+    notifyListeners();
+  }
+
+  void clear() {
+    _data = [];
+    _data2 = [];
+  }
+
   List<String> setData2(List<String> newData) {
     _data2.addAll(newData);
     notifyListeners();
@@ -25,8 +44,13 @@ class DataViewViewModel with ChangeNotifier {
     return _data2;
   }
 
-  void getPrice(int Price) {
-    _price = _price + Price;
+  void removeprice() {
+    _price = 0;
+    notifyListeners();
+  }
+
+  void getPrice(double Price) {
+    _price = _price + Price.toInt();
     notifyListeners();
   }
 }

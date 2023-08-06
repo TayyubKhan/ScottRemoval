@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable, camel_case_types
+
 import 'package:flutter/material.dart';
 
 import '../colors.dart';
@@ -20,31 +22,37 @@ class Rounded_Button extends StatelessWidget {
     return InkWell(
       onTap: onPress,
       child: Container(
-          height: height * 0.05,
+          height: height * 0.06,
           width: width * 0.8,
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20), color: BC.login),
-          child: Center(
-              child: loading
-                  ? const CircularProgressIndicator(
-                      color: BC.white,
-                    )
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+              borderRadius: BorderRadius.circular(35), color: BC.login),
+          child: loading
+              ? const Center(
+                  child: CircularProgressIndicator(
+                    color: BC.white,
+                  ),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 80),
+                      child: Text(title,
+                          style: const TextStyle(
+                              color: BC.textcolor,
+                              fontFamily: "HelveticaBold")),
+                    ),
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        SizedBox(
-                          width: width * 0.125,
-                        ),
-                        Text(title,
-                            style: const TextStyle(
-                                color: BC.textcolor,
-                                fontFamily: "HelveticaBold")),
-                        const Icon(
+                        Icon(
                           Icons.login_sharp,
                           color: Colors.white,
-                        )
+                        ),
                       ],
-                    ))),
+                    )
+                  ],
+                )),
     );
   }
 }
@@ -69,10 +77,10 @@ class Rounded_Button2 extends StatelessWidget {
     return InkWell(
       onTap: onPress,
       child: Container(
-          height: height * 0.05,
+          height: height * 0.06,
           width: width * 0.8,
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20), color: BC.login),
+              borderRadius: BorderRadius.circular(35), color: BC.login),
           child: Center(
             child: loading
                 ? const CircularProgressIndicator(
@@ -80,9 +88,9 @@ class Rounded_Button2 extends StatelessWidget {
                   )
                 : Center(
                     child: Text(title,
-                        style: const TextStyle(
+                        style: TextStyle(
                             color: BC.textcolor,
-                            fontSize: 18,
+                            fontSize: width * 0.06,
                             fontFamily: "HelveticaBold")),
                   ),
           )),

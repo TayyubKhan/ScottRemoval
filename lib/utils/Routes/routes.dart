@@ -5,6 +5,7 @@ import 'package:scotremovals/view/add_Items_view.dart';
 import 'package:scotremovals/view/add_floor_view.dart';
 import 'package:scotremovals/view/add_photo_view.dart';
 import 'package:scotremovals/view/comment_View.dart';
+import 'package:scotremovals/view/extra_itemView.dart';
 import 'package:scotremovals/view/signature_view.dart';
 import 'package:scotremovals/view/waiverForm_View.dart';
 
@@ -53,6 +54,9 @@ class Routes {
       case RoutesName.test:
         return MaterialPageRoute(
             builder: (BuildContext context) => MapScreen());
+      case RoutesName.extraitem:
+        return MaterialPageRoute(
+            builder: (BuildContext context) => Extra_Items_View());
       default:
         return MaterialPageRoute(builder: (_) {
           return const Scaffold(

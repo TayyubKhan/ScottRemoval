@@ -21,15 +21,15 @@ class Client_Detail_List_Model {
 
 class Data {
   String? name;
-  Null? username;
+  dynamic username;
   String? email;
   String? createdOn;
-  Null? lastLogin;
-  Null? active;
-  Null? company;
+  dynamic lastLogin;
+  dynamic active;
+  dynamic company;
   String? phone;
-  Null? avatar;
-  Null? gender;
+  dynamic avatar;
+  dynamic gender;
 
   Data(
       {this.name,

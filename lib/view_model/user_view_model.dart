@@ -6,9 +6,6 @@ class UserViewModel with ChangeNotifier {
   Future<bool> saveUser(UserLogin_Model user) async {
     final SharedPreferences sp = await SharedPreferences.getInstance();
     sp.setString('token', user.loginToken.toString());
-    if (kDebugMode) {
-      print(user.loginToken);
-    }
     notifyListeners();
     return true;
   }

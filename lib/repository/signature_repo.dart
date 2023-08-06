@@ -3,13 +3,13 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:scotremovals/data/network/network_api_services.dart';
+import 'package:scotremovals/view_model/auth_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../res/app_url.dart';
 import '../utils/utilis.dart';
 
-Netwrok_API_Services _apiservices = Netwrok_API_Services();
+AuthViewModelProvider myrepo = AuthViewModelProvider();
 
 class SignatureRepo {
   Future<bool> signatureAPI(
@@ -37,15 +37,21 @@ class SignatureRepo {
       final response =
           await request.send().timeout(const Duration(seconds: 10));
       dynamic jsonResponse = json.decode(await response.stream.bytesToString());
-      if (jsonResponse['status' == 200]) {
-        Utilis.submitted_flushbar_message(context, 'Submitted');
+      if (kDebugMode) {
+        print(jsonResponse);
+      }
+      if (jsonResponse['status'] == 200) {
+        Utilis.Snackbar_Message(context, 'Submitted');
+        myrepo.setLoading(false);
         return true;
       } else {
-        Utilis.error_flushbar_message(context, 'Try again');
+        Utilis.Snackbar_ErrorMessage(context, 'Try again');
+        myrepo.setLoading(false);
         return false;
       }
     } catch (e) {
-      Utilis.error_flushbar_message(context, e.toString());
+      Utilis.Snackbar_ErrorMessage(context, e.toString());
+      myrepo.setLoading(false);
       return false;
     }
   }

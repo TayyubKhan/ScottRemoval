@@ -33,7 +33,7 @@ class Data {
   String? bussinessName;
   String? businessDescription;
   String? photo;
-  Null? vanPhoto;
+  dynamic vanPhoto;
   String? addressLine2;
   String? nonUkAddressLine1;
   String? nonUkAddressLine2;

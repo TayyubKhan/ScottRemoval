@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
+import '../colors.dart';
+
 class CameraComponent extends StatefulWidget {
   final CameraDescription camera;
   const CameraComponent({Key? key, required this.camera}) : super(key: key);
@@ -36,20 +38,33 @@ class _CameraComponentState extends State<CameraComponent> {
 
   @override
   Widget build(BuildContext context) {
+    var height = MediaQuery.of(context).size.height * 1;
+    var width = MediaQuery.of(context).size.width * 1;
     return Scaffold(
-      appBar: AppBar(title: Text('Take a picture')),
+      appBar: AppBar(
+        toolbarHeight: height * 0.08,
+        backgroundColor: BC.blue,
+        title: Text(
+          'Add Photo ',
+          style: TextStyle(
+              color: BC.white,
+              fontSize: width * 0.067,
+              fontFamily: "HelveticaBold"),
+        ),
+      ),
       body: FutureBuilder<void>(
         future: _initializeControllerFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             return CameraPreview(_controller);
           } else {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
         },
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.camera_alt),
+        backgroundColor: BC.blue,
+        child: const Icon(Icons.camera_alt),
         onPressed: () async {
           try {
             // Ensure that the camera is initialized

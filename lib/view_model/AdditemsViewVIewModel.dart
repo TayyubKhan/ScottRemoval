@@ -11,8 +11,15 @@ class ItemViewViewModel with ChangeNotifier {
   String? get selectedFloor => _selectedFloor;
   String? _selectedItem;
   String? get selectedItem => _selectedItem;
+  List<int?> _list = [];
+  List<int?> get list => _list;
   set selectedItem(String? value) {
     _selectedFloor = value;
+    notifyListeners();
+  }
+
+  void addlist() {
+    _list = _savedid;
     notifyListeners();
   }
 
@@ -63,6 +70,12 @@ class ItemViewViewModel with ChangeNotifier {
   List<String> passitem() {
     notifyListeners();
     return _dropDownIList;
+  }
+
+  void clear() {
+    _id = [];
+    _savedid = [];
+    _savedItem = [];
   }
 
   void saveitem(String item) {
