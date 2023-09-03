@@ -43,14 +43,14 @@ class ItemsAndFloorView extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  InkWell(
-                    onTap: () {
-                      Navigator.pushNamed(context, RoutesName.addItems);
-                    },
-                    child: Row(
+              InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, RoutesName.addItems);
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
                       children: [
                         Text(
                           'Additional Items',
@@ -60,16 +60,11 @@ class ItemsAndFloorView extends StatelessWidget {
                         ),
                       ],
                     ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      Navigator.pushNamed(context, RoutesName.addItems);
-                    },
-                    child: const Image(
+                    const Image(
                       image: AssetImage('assets/addMenu.png'),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               const SizedBox(
                 height: 10,

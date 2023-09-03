@@ -6,12 +6,9 @@ import 'package:scotremovals/model/WonJobModel.dart';
 import 'package:scotremovals/utils/utilis.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../data/network/network_api_services.dart';
 import '../res/app_url.dart';
 
 class HomeRepository {
-  Netwrok_API_Services _apiservices = Netwrok_API_Services();
-
   Future<WonJobModel> fetchData(BuildContext context) async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     var jsonResponse;

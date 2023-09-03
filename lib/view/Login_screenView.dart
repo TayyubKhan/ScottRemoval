@@ -133,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 decoration: InputDecoration(
                                   labelText: "Password",
                                   labelStyle:
-                                      const TextStyle(color: Colors.black),
+                                      const TextStyle(color: Colors.grey),
                                   focusColor: Colors.black,
                                   focusedBorder: const UnderlineInputBorder(),
                                   alignLabelWithHint: false,

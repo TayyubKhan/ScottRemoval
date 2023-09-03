@@ -2,11 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:scotremovals/repository/floor_repo.dart';
 import 'package:scotremovals/res/Components/Rounded_Button.dart';
+import 'package:scotremovals/res/app_url.dart';
 import 'package:scotremovals/view_model/AdditemsViewVIewModel.dart';
+import 'package:scotremovals/view_model/dataViewModel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../repository/ExtraItemsRepo.dart';
 import '../repository/updateItemRepo.dart';
 import '../res/colors.dart';
 import '../utils/Routes/routes_name.dart';
@@ -27,6 +29,7 @@ List<int> save = [];
 class _Extra_Items_ViewState extends State<Extra_Items_View> {
   final FocusNode _focusNode = FocusNode();
   String selectedOption = '';
+  bool add = false;
   final String _selectedItem = 'Dismantling Service';
   final String _rselectedItem = 'Reassembly Service';
   final String _pselectedItem = 'Packing Service';
@@ -39,13 +42,14 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
     '5th Floor',
   ];
   List<String> filteredOptions = [];
-
-  FloorAndItemRepo floorAndItemRepo = FloorAndItemRepo();
+  int id = 0;
+  ExtraItemRepo extraItemApi = ExtraItemRepo();
   @override
   bool get wantKeepAlive => true;
   Widget build(BuildContext context) {
     UpdateItemRepo up = UpdateItemRepo();
     final item = Provider.of<ItemViewViewModel>(context, listen: true);
+    final data = Provider.of<DataViewViewModel>(context, listen: true);
     final it = Provider.of<ExtraItemViewViewModel>(context);
     var height = MediaQuery.of(context).size.height * 1;
     var width = MediaQuery.of(context).size.width * 1;
@@ -101,17 +105,18 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                             child: Consumer<ExtraItemViewViewModel>(
                                 builder: (context, ItemModel, child) {
                               return FutureBuilder(
-                                future: floorAndItemRepo.GetItemsDetails(),
+                                future: extraItemApi
+                                    .getExtraItemRepo(AppUrl.dismantle),
                                 builder: (BuildContext context,
                                     AsyncSnapshot<dynamic> snapshot) {
                                   if (snapshot.hasData) {
                                     for (int i = 0;
-                                        i < snapshot.data['items'].length;
+                                        i < snapshot.data['data'].length;
                                         i++) {
-                                      ItemModel.getid(int.parse(snapshot
-                                          .data['items'][i]['product_id']));
-                                      ItemModel.getItem(snapshot.data['items']
-                                              [i]['name']
+                                      ItemModel.getid(int.parse(
+                                          snapshot.data['data'][i]['id']));
+                                      ItemModel.getItem(snapshot.data['data'][i]
+                                              ['name']
                                           .toString());
                                     }
                                     return DropdownButton(
@@ -191,7 +196,8 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                           Consumer<ExtraItemViewViewModel>(
                               builder: (context, value, child) {
                             return FutureBuilder(
-                              future: floorAndItemRepo.GetItemsDetails(),
+                              future: extraItemApi
+                                  .getExtraItemRepo(AppUrl.dismantle),
                               builder: (BuildContext context,
                                   AsyncSnapshot<dynamic> snapshot) {
                                 if (snapshot.hasData) {
@@ -212,7 +218,7 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                                                   ),
                                                   Container(
                                                     padding: const EdgeInsets
-                                                            .symmetric(
+                                                        .symmetric(
                                                         horizontal: 20,
                                                         vertical: 5),
                                                     decoration: BoxDecoration(
@@ -367,16 +373,17 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                             child: Consumer<ExtraItemViewViewModel>(
                                 builder: (context, ItemModel, child) {
                               return FutureBuilder(
-                                future: floorAndItemRepo.GetItemsDetails(),
+                                future: extraItemApi
+                                    .getExtraItemRepo(AppUrl.assembly),
                                 builder: (BuildContext context,
                                     AsyncSnapshot<dynamic> snapshot) {
                                   if (snapshot.hasData) {
                                     for (int i = 0;
-                                        i < snapshot.data['items'].length;
+                                        i < snapshot.data['data'].length;
                                         i++) {
-                                      ItemModel.getrid(int.parse(snapshot
-                                          .data['items'][i]['product_id']));
-                                      ItemModel.getrItem(snapshot.data['items']
+                                      ItemModel.getrid(int.parse(
+                                          snapshot.data['data'][i]['id']));
+                                      ItemModel.getrItem(snapshot.data['data']
                                               [i]['name']
                                           .toString());
                                     }
@@ -459,7 +466,8 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                               builder: (context, value, child) {
                             print(value.rsavedid);
                             return FutureBuilder(
-                              future: floorAndItemRepo.GetItemsDetails(),
+                              future: extraItemApi
+                                  .getExtraItemRepo(AppUrl.assembly),
                               builder: (BuildContext context,
                                   AsyncSnapshot<dynamic> snapshot) {
                                 if (snapshot.hasData) {
@@ -480,7 +488,7 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                                                   ),
                                                   Container(
                                                     padding: const EdgeInsets
-                                                            .symmetric(
+                                                        .symmetric(
                                                         horizontal: 20,
                                                         vertical: 5),
                                                     decoration: BoxDecoration(
@@ -633,16 +641,18 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                             child: Consumer<ExtraItemViewViewModel>(
                                 builder: (context, ItemModel, child) {
                               return FutureBuilder(
-                                future: floorAndItemRepo.GetItemsDetails(),
+                                future: extraItemApi
+                                    .getExtraItemRepo(AppUrl.packing),
                                 builder: (BuildContext context,
                                     AsyncSnapshot<dynamic> snapshot) {
                                   if (snapshot.hasData) {
+                                    print(ItemModel.pdropDownIList);
                                     for (int i = 0;
-                                        i < snapshot.data['items'].length;
+                                        i < snapshot.data['data'].length;
                                         i++) {
-                                      ItemModel.getpid(int.parse(snapshot
-                                          .data['items'][i]['product_id']));
-                                      ItemModel.getpItem(snapshot.data['items']
+                                      ItemModel.getpid(int.parse(
+                                          snapshot.data['data'][i]['id']));
+                                      ItemModel.getpItem(snapshot.data['data']
                                               [i]['name']
                                           .toString());
                                     }
@@ -656,7 +666,7 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                                         Icons.search,
                                       ),
                                       value: ItemModel.pselectedItem ??
-                                          _pselectedItem,
+                                          'Packing Service',
                                       onChanged: (value) {
                                         if (value != 'Packing Service') {
                                           ItemModel.pdropDownIList
@@ -681,7 +691,7 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                                         _focusNode.unfocus();
                                       },
                                       items:
-                                          ItemModel.rdropDownIList.map((item) {
+                                          ItemModel.pdropDownIList.map((item) {
                                         return DropdownMenuItem(
                                           value: item,
                                           child: Text(item),
@@ -726,7 +736,8 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                           Consumer<ExtraItemViewViewModel>(
                               builder: (context, value, child) {
                             return FutureBuilder(
-                              future: floorAndItemRepo.GetItemsDetails(),
+                              future:
+                                  extraItemApi.getExtraItemRepo(AppUrl.packing),
                               builder: (BuildContext context,
                                   AsyncSnapshot<dynamic> snapshot) {
                                 if (snapshot.hasData) {
@@ -744,7 +755,7 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                                                 children: [
                                                   Container(
                                                     padding: const EdgeInsets
-                                                            .symmetric(
+                                                        .symmetric(
                                                         horizontal: 20,
                                                         vertical: 5),
                                                     decoration: BoxDecoration(
@@ -898,19 +909,16 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                           width: width * 0.9,
                           height: height * 1,
                           title: "DONE",
+                          loading: value.loading,
                           onPress: () async {
+                            value.setLoading(true);
                             it.saveallid();
-
                             save.addAll(it.rsavedid);
-
                             save.addAll(it.psavedid);
-                            print(item.savedid);
                             save.addAll(it.dismantlesavedid);
                             for (int i = 0; i < save.length; i++) {
                               item.getsavedid(save[i]);
                             }
-                            print(item.savedid);
-                            // print(it.allid);
                             SharedPreferences sp =
                                 await SharedPreferences.getInstance();
 
@@ -927,15 +935,33 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                                     "name": it.rsavedItem[i],
                                     "id": it.rsavedid[i],
                                     "quantity": it.counters[i].value.toString(),
-                                    "tab": "Living",
-                                    "type": "Reassembly Service",
-                                    "parent": "498",
-                                    "parent_name": ""
+                                    "type": "Reassembly Service"
                                   };
-                                  updateItem.add(item);
+                                  for (int j = 0;
+                                      j < data.dataList.length;
+                                      j++) {
+                                    String id =
+                                        data.dataList[j]['name'].toString();
+                                    if (it.rsavedItem[i] == id) {
+                                      add = false;
+                                      int quantity = int.parse(
+                                              it.counters[i].value.toString()) +
+                                          int.parse(
+                                              data.dataList[j]["quantity"]);
+                                      data.dataList[j]["quantity"] =
+                                          quantity.toString();
+                                      break;
+                                    } else {
+                                      add = true;
+                                      continue;
+                                    }
+                                  }
+                                  if (add == true) {
+                                    updateItem.add(item);
+                                  }
                                 }
                               }
-
+                              add = false;
                               if (it.dsavedItem.isNotEmpty) {
                                 for (int i = 0;
                                     i < it.dismantlesavedid.length;
@@ -948,15 +974,35 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                                     "id": it.dismantlesavedid[i],
                                     "quantity":
                                         it.Dcounters[i].value.toString(),
-                                    "tab": "Living",
-                                    "type": "Dismantling Service",
-                                    "parent": "498",
-                                    "parent_name": ""
+                                    "type": "Dismantling Service"
                                   };
-                                  updateItem.add(item);
+                                  for (int j = 0;
+                                      j < data.dataList.length;
+                                      j++) {
+                                    String id =
+                                        data.dataList[j]['name'].toString();
+                                    if (it.dsavedItem[i] == id) {
+                                      add = false;
+                                      print(data.dataList[j]["quantity"]);
+                                      int quantity = int.parse(
+                                              it.counters[i].value.toString()) +
+                                          int.parse(
+                                              data.dataList[j]["quantity"]);
+                                      data.dataList[j]["quantity"] =
+                                          quantity.toString();
+                                      print(data.dataList[j]["quantity"]);
+                                      break;
+                                    } else {
+                                      add = true;
+                                      continue;
+                                    }
+                                  }
+                                  if (add == true) {
+                                    updateItem.add(item);
+                                  }
                                 }
                               }
-
+                              add = false;
                               if (it.psavedItem.isNotEmpty) {
                                 for (int i = 0; i < it.psavedid.length; i++) {
                                   item.getsavedid(it.psavedid[i]);
@@ -967,23 +1013,42 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                                     "id": it.psavedid[i],
                                     "quantity":
                                         it.pcounters[i].value.toString(),
-                                    "tab": "Living",
-                                    "type": "Packing Service",
-                                    "parent": "498",
-                                    "parent_name": ""
+                                    "type": "Packing Service"
                                   };
-                                  updateItem.add(item);
+                                  for (int j = 0;
+                                      j < data.dataList.length;
+                                      j++) {
+                                    String id =
+                                        data.dataList[j]['name'].toString();
+                                    if (it.psavedItem[i] == id) {
+                                      add = false;
+                                      print(data.dataList[j]["quantity"]);
+                                      int quantity = int.parse(
+                                              it.counters[i].value.toString()) +
+                                          int.parse(
+                                              data.dataList[j]["quantity"]);
+                                      data.dataList[j]["quantity"] =
+                                          quantity.toString();
+                                      print(data.dataList[j]["quantity"]);
+                                      break;
+                                    } else {
+                                      add = true;
+                                      continue;
+                                    }
+                                  }
+                                  if (add == true) {
+                                    updateItem.add(item);
+                                  }
                                 }
                               }
                               it.addlist();
-
+                              updateItem.addAll(data.dataList);
                               value.setLoading(true);
                               await up.UpdateItemAPI(context,
                                   sp.get('orderId').toString(), updateItem);
                               value.setLoading(false);
                               Navigator.pushNamed(
                                   context, RoutesName.singleOrder);
-
                               Utilis.submitted_flushbar_message(
                                   context, 'Success');
                             } else {

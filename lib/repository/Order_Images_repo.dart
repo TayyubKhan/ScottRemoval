@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -25,6 +26,7 @@ class OrderImages {
         'Postman-Token': '<calculated when request is sent>',
       });
       // Add the image files to the request
+      log(imageFiles.length.toString());
       for (var i = 0; i < imageFiles.length; i++) {
         final imageFile = imageFiles[i];
         final stream = http.ByteStream(imageFile.openRead());
@@ -40,10 +42,9 @@ class OrderImages {
         request.fields['order_id'] = orderId.toString();
         request.files.add(img);
       }
-
       // Send the request
       final response =
-          await request.send().timeout(const Duration(seconds: 10));
+          await request.send().timeout(const Duration(seconds: 100));
       final responseData = await response.stream.bytesToString();
       dynamic jsonResponse = json.decode(responseData);
       if (jsonResponse['status'] == 200) {

@@ -1,5 +1,4 @@
 // ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:scotremovals/repository/comment_repo.dart';
@@ -10,18 +9,33 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../res/Components/Rounded_Button.dart';
 import '../res/colors.dart';
 import '../utils/Routes/routes_name.dart';
+import '../view_model/dataViewModel.dart';
 
-class Comment_View extends StatefulWidget {
+class CommentView extends StatefulWidget {
+  const CommentView({super.key});
+
   @override
-  State<Comment_View> createState() => _Comment_ViewState();
+  State<CommentView> createState() => _CommentViewState();
 }
 
-CommentRepo commentRepo = CommentRepo();
-TextEditingController _controller = TextEditingController();
+class _CommentViewState extends State<CommentView> {
+  CommentRepo commentRepo = CommentRepo();
+  TextEditingController _controller = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    // TODO: implement initState
+    final dataa = Provider.of<DataViewViewModel>(context, listen: false);
+    if (dataa.cmt[dataa.index] != null) {
+      if (dataa.cmt[dataa.index] != '') {
+        _controller = TextEditingController(text: dataa.cmt[dataa.index]);
+      }
+    }
+  }
 
-class _Comment_ViewState extends State<Comment_View> {
   @override
   Widget build(BuildContext context) {
+    final data = Provider.of<DataViewViewModel>(context, listen: true);
     var height = MediaQuery.of(context).size.height * 1;
     var width = MediaQuery.of(context).size.width * 1;
     return WillPopScope(
@@ -92,10 +106,10 @@ class _Comment_ViewState extends State<Comment_View> {
                               value.setLoading(true);
                               dynamic valid = await commentRepo.CommentAPI(
                                       context,
-                                      sp.get('id').toString(),
-                                      '593',
+                                      sp.get('orderId').toString(),
+                                      sp.get('user_id').toString(),
                                       sp.getString('driver').toString(),
-                                      _controller.toString())
+                                      _controller.text.toString())
                                   .onError((error, stackTrace) =>
                                       Utilis.error_flushbar_message(
                                           context, error.toString()));
@@ -109,8 +123,6 @@ class _Comment_ViewState extends State<Comment_View> {
                                   context, 'Kindly Comment Us');
                               value.setLoading(false);
                             }
-
-                            ;
                           });
                     },
                   ),

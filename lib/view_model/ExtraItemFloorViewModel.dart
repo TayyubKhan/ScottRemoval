@@ -124,7 +124,7 @@ class ExtraItemViewViewModel with ChangeNotifier {
   }
 
   void saveitem(String item) {
-    if (item == 'Reassembly Service' && _rsavedItem.contains(item)) {
+    if (item == 'Reassembly Service' || _rsavedItem.contains(item)) {
     } else {
       _rsavedItem.add(item);
       _rsavedItem.reversed;
@@ -133,7 +133,7 @@ class ExtraItemViewViewModel with ChangeNotifier {
   }
 
   void savepitem(String item) {
-    if (item == 'Packing Service' && _psavedItem.contains(item)) {
+    if (item == 'Packing Service' || _psavedItem.contains(item)) {
     } else {
       _psavedItem.add(item);
       _psavedItem.reversed;
@@ -142,7 +142,7 @@ class ExtraItemViewViewModel with ChangeNotifier {
   }
 
   void dsaveitem(String item) {
-    if (item == 'Dismantling Service' && _dsavedItem.contains(item)) {
+    if (item == 'Dismantling Service' || _dsavedItem.contains(item)) {
     } else {
       _dsavedItem.add(item);
       _dsavedItem.reversed;

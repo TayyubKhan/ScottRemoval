@@ -28,15 +28,21 @@ class _Signature_ViewState extends State<Signature_View>
   SignatureRepo signatureRepo = SignatureRepo();
   final GlobalKey<SfSignaturePadState> _signaturePadKey = GlobalKey();
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    show = false;
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
     bool draw = false;
-    final signature = Provider.of<SignatureProvider>(context, listen: false);
     final data = Provider.of<DataViewViewModel>(context);
     var height = MediaQuery.of(context).size.height * 1;
     var width = MediaQuery.of(context).size.width * 1;
     return WillPopScope(
-      onWillPop: () async{
+      onWillPop: () async {
         Navigator.pushNamed(context, RoutesName.singleOrder);
         return false;
       },
@@ -80,8 +86,10 @@ class _Signature_ViewState extends State<Signature_View>
                 ),
                 InkWell(
                   onTap: () {
-                    _signaturePadKey.currentState!.clear();
                     draw = false;
+                    show = true;
+                    setState(() {});
+                    _signaturePadKey.currentState!.clear();
                   },
                   child: const Text(
                     'Clear Signature',
@@ -107,7 +115,7 @@ class _Signature_ViewState extends State<Signature_View>
                                 color: Colors.grey,
                               ),
                             ),
-                            child: draw == false && signature.show == true
+                            child: show == true
                                 ? SfSignaturePad(
                                     onDrawStart: () {
                                       draw = true;
@@ -117,11 +125,11 @@ class _Signature_ViewState extends State<Signature_View>
                                   )
                                 : InkWell(
                                     onTap: () {
-                                      signature.setshow(true);
+                                      show = true;
                                       setState(() {});
                                     },
-                                    child:
-                                        Image.memory(signature.signatureBytes!))),
+                                    child: Image.memory(
+                                        data.signature[data.index]!))),
                       ),
                       const SizedBox(
                         height: 20,
@@ -145,12 +153,10 @@ class _Signature_ViewState extends State<Signature_View>
                               await _signaturePadKey.currentState?.toImage();
                           final bytes = await signatureData?.toByteData(
                               format: ImageByteFormat.png);
-
                           Uint8List pngBytes;
                           pngBytes = bytes!.buffer.asUint8List();
-                          Provider.of<SignatureProvider>(context, listen: false)
-                              .setSignatureBytes(pngBytes);
-                          signature.setshow(false);
+                          Provider.of<DataViewViewModel>(context, listen: false)
+                              .setSignatureBytes(pngBytes, data.index);
                           if (draw == true) {
                             value.setLoading(true);
                             dynamic valid = await signatureRepo
@@ -166,10 +172,8 @@ class _Signature_ViewState extends State<Signature_View>
                                   context, RoutesName.singleOrder);
                             }
                           } else {
-                            draw == false && signature.show == true
-                                ? Utilis.error_flushbar_message(
-                                    context, 'Please Sign')
-                                : Utilis();
+                            Utilis.error_flushbar_message(
+                                context, 'Please Sign');
                           }
                         },
                       );
@@ -188,23 +192,4 @@ class _Signature_ViewState extends State<Signature_View>
   @override
   // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
-}
-
-class SignatureProvider with ChangeNotifier {
-  Uint8List? _signatureBytes;
-  bool _show = true;
-
-  bool get show => _show;
-
-  Uint8List? get signatureBytes => _signatureBytes;
-
-  void setSignatureBytes(Uint8List bytes) {
-    _signatureBytes = bytes;
-    notifyListeners();
-  }
-
-  void setshow(bool show) {
-    _show = show;
-    notifyListeners();
-  }
 }

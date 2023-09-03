@@ -1,10 +1,12 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 
 import '../colors.dart';
 
-class Row_Component extends StatelessWidget {
+class RowComponent extends StatelessWidget {
   String string1, string2;
-  Row_Component({Key? key, required this.string1, required this.string2})
+  RowComponent({Key? key, required this.string1, required this.string2})
       : super(key: key);
 
   @override

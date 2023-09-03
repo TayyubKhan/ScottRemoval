@@ -17,5 +17,8 @@ class AppUrl {
   static var pricesWithSlug = '${baseUrl}Order/get_prices_with_slug';
   static var dropout = '${baseUrl}order/update_drop_status';
   static var pickup = '${baseUrl}order/update_pickup_status';
+  static var packing = '${baseUrl}order/get_packing_service_products';
+  static var assembly = '${baseUrl}order/get_reassembly_service_products';
+  static var dismantle = '${baseUrl}order/get_dismantling_service_products';
   static var API_key = '0kks8oswoksockoo4csg0cc44k8s4gw40s04448o';
 }

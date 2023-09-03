@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 
 import 'package:camera/camera.dart';
@@ -69,7 +71,6 @@ class _CameraComponentState extends State<CameraComponent> {
           try {
             // Ensure that the camera is initialized
             await _initializeControllerFuture;
-
             // Capture the image and save it to a file
             final image = await _controller.takePicture();
             Navigator.of(context).pop(File(image.path));

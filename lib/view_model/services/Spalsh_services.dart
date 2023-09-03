@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:scotremovals/model/User_Login_Model.dart';
@@ -20,6 +22,8 @@ class SplashServices {
         fk.fetchCookieAndLoginToken();
         await Future.delayed(const Duration(milliseconds: 1));
         Navigator.pushNamed(context, RoutesName.home);
+        // Navigator.push(
+        //     context, MaterialPageRoute(builder: (context) => Temp()));
       }
     }).onError((error, stackTrace) {
       if (kDebugMode) {

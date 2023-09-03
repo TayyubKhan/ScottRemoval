@@ -2,14 +2,17 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:scotremovals/model/WonJobModel.dart';
+import 'package:scotremovals/repository/image.dart';
 import 'package:scotremovals/repository/pickuprepo.dart';
 import 'package:scotremovals/res/Components/Call_and_Message.dart';
 import 'package:scotremovals/res/Components/CardComponents.dart';
@@ -20,8 +23,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../repository/dropoutrepo.dart';
 import '../repository/home_repo.dart';
+import '../repository/orderDetailsRepo.dart';
 import '../repository/withourmodel_repo.dart';
 import '../res/colors.dart';
+import '../utils/utilis.dart';
 import '../view_model/auth_view_model.dart';
 import '../view_model/dataViewModel.dart';
 
@@ -63,8 +68,14 @@ class _Order_DetailState extends State<Order_Detail> {
     });
   }
 
+  bool isButtonClickable(String date) {
+    DateTime time = DateTime.parse(date);
+    DateTime futureTime = time.add(const Duration(hours: 48));
+    return DateTime.now().isAfter(futureTime);
+  }
+
   ScrollController scrollController = ScrollController();
-  void _addMarkers() async {
+  Future<void> _addMarkers() async {
     await _createCustomMarkerIcon();
     _markers.add(Marker(
       icon: customIcon,
@@ -78,12 +89,6 @@ class _Order_DetailState extends State<Order_Detail> {
       position: destlatlng,
       infoWindow: const InfoWindow(title: 'Destination'),
     ));
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
   }
 
   Future<void> _getPolylines() async {
@@ -101,25 +106,25 @@ class _Order_DetailState extends State<Order_Detail> {
           polylineCoordinates.add(LatLng(point.latitude, point.longitude));
         }
       }
-
-      setState(() {
-        _polylines.add(
-          Polyline(
-            width: 4,
-            polylineId: const PolylineId('route1'),
-            color: BC.blue,
-            points: polylineCoordinates,
-          ),
-        );
-      });
+      _polylines.add(
+        Polyline(
+          width: 4,
+          polylineId: const PolylineId('route1'),
+          color: BC.blue,
+          points: polylineCoordinates,
+        ),
+      );
+      // setState(() {});
     } catch (e) {
       startlatlng = const LatLng(0.00, 0.00);
       destlatlng = const LatLng(0.00, 0.00);
     }
   }
 
+  List<Map<String, dynamic>> dataList = [];
   @override
   Widget build(BuildContext context) {
+    final order = OrderDetailRepo();
     int total = 0;
     final data = Provider.of<DataViewViewModel>(context);
     var height = MediaQuery.of(context).size.height * 1;
@@ -148,14 +153,16 @@ class _Order_DetailState extends State<Order_Detail> {
             builder: (BuildContext context, snapshot) {
               if (snapshot.hasData) {
                 return Text(
-                  snapshot.data!.data![index].id.toString(),
+                  snapshot.data!.data![index].trackingID,
                   style: TextStyle(
                       fontSize: width * 0.067,
                       fontFamily: "HelveticaBold",
                       color: BC.white),
                 );
               }
-              return const Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator(
+                color:BC.blue
+              ));
             },
           ),
           centerTitle: true,
@@ -197,7 +204,6 @@ class _Order_DetailState extends State<Order_Detail> {
                               if (kDebugMode) {
                                 print(destlatlng.latitude);
                               }
-                              List<Map<String, dynamic>> dataList;
                               List<Map<String, dynamic>> dt = [];
                               if (snapshot.data!.data![index].productsList!
                                   .toString()
@@ -212,15 +218,10 @@ class _Order_DetailState extends State<Order_Detail> {
                                 total =
                                     total + int.parse(dataList[j]['quantity']);
                               }
-                              void get() async {
-                                SharedPreferences sp =
-                                    await SharedPreferences.getInstance();
-                                sp.setString('id',
-                                    snapshot.data!.data![index].id.toString());
-                              }
 
                               _getPolylines();
                               _addMarkers();
+                              log('${snapshot.data!.data![index].orderDate}T${snapshot.data!.data![index].strtTime}');
                               return SizedBox(
                                 width: MediaQuery.of(context).size.width,
                                 child: IntrinsicHeight(
@@ -255,7 +256,33 @@ class _Order_DetailState extends State<Order_Detail> {
                                                 polylines: _polylines,
                                                 onMapCreated:
                                                     (GoogleMapController
-                                                        controller) {
+                                                        controller) async {
+                                                  dynamic imageResponse =
+                                                      await http.get(Uri.parse(
+                                                          'https://scotremovals.com/api/assets/order_signatures/${snapshot.data!.data![index].signature}'));
+                                                  if (imageResponse.bodyBytes !=
+                                                      null) {
+                                                    data.setSignatureBytes(
+                                                        imageResponse.bodyBytes,
+                                                        index);
+                                                  }
+
+                                                  dynamic response = await order
+                                                      .orderDetailApi(context);
+                                                  data.getdata(
+                                                      response['waiver_form'][
+                                                              response['waiver_form']
+                                                                      .length -
+                                                                  1]['waiver_description']
+                                                          .toString(),
+                                                      index);
+                                                  data.getdata2(
+                                                      response['comments'][
+                                                              response['comments']
+                                                                      .length -
+                                                                  1]['messege']
+                                                          .toString(),
+                                                      index);
                                                   _controller
                                                       .complete(controller);
                                                 },
@@ -302,7 +329,7 @@ class _Order_DetailState extends State<Order_Detail> {
                                               children: [
                                                 Container(
                                                   padding: const EdgeInsets
-                                                          .symmetric(
+                                                      .symmetric(
                                                       horizontal: 10,
                                                       vertical: 5),
                                                   decoration: BoxDecoration(
@@ -325,7 +352,7 @@ class _Order_DetailState extends State<Order_Detail> {
                                                 ),
                                                 Container(
                                                   padding: const EdgeInsets
-                                                          .symmetric(
+                                                      .symmetric(
                                                       horizontal: 20,
                                                       vertical: 5),
                                                   decoration: BoxDecoration(
@@ -502,23 +529,29 @@ class _Order_DetailState extends State<Order_Detail> {
                                                         MainAxisAlignment.end,
                                                     children: [
                                                       InkWell(
-                                                        onTap: () {
-                                                          data.status == true
-                                                              ? calland_message
-                                                                  .makeMessage(snapshot
-                                                                      .data!
-                                                                      .data![
-                                                                          index]
-                                                                      .pickupPhone
-                                                                      .toString())
-                                                              : calland_message
-                                                                  .makeMessage(snapshot
-                                                                      .data!
-                                                                      .data![
-                                                                          index]
-                                                                      .deliveryPhone
-                                                                      .toString());
-                                                        },
+                                                        onTap: isButtonClickable(
+                                                                '${snapshot.data!.data![index].orderDate}T${snapshot.data!.data![index].strtTime}')
+                                                            ? () {
+                                                                data.status ==
+                                                                        true
+                                                                    ? calland_message.makeMessage(snapshot
+                                                                        .data!
+                                                                        .data![
+                                                                            index]
+                                                                        .pickupPhone
+                                                                        .toString())
+                                                                    : calland_message.makeMessage(snapshot
+                                                                        .data!
+                                                                        .data![
+                                                                            index]
+                                                                        .deliveryPhone
+                                                                        .toString());
+                                                              }
+                                                            : () {
+                                                                Utilis.error_flushbar_message(
+                                                                    context,
+                                                                    'Will be available after 48 hours');
+                                                              },
                                                         child: const Image(
                                                           image: AssetImage(
                                                               'assets/comment.png'),
@@ -527,23 +560,29 @@ class _Order_DetailState extends State<Order_Detail> {
                                                       SizedBox(
                                                           width: width * 0.05),
                                                       InkWell(
-                                                        onTap: () {
-                                                          data.status == true
-                                                              ? calland_message
-                                                                  .makePhoneCall(snapshot
-                                                                      .data!
-                                                                      .data![
-                                                                          index]
-                                                                      .pickupPhone
-                                                                      .toString())
-                                                              : calland_message
-                                                                  .makePhoneCall(snapshot
-                                                                      .data!
-                                                                      .data![
-                                                                          index]
-                                                                      .deliveryPhone
-                                                                      .toString());
-                                                        },
+                                                        onTap: isButtonClickable(
+                                                                '${snapshot.data!.data![index].orderDate}T${snapshot.data!.data![index].strtTime}')
+                                                            ? () {
+                                                                data.status ==
+                                                                        true
+                                                                    ? calland_message.makePhoneCall(snapshot
+                                                                        .data!
+                                                                        .data![
+                                                                            index]
+                                                                        .pickupPhone
+                                                                        .toString())
+                                                                    : calland_message.makePhoneCall(snapshot
+                                                                        .data!
+                                                                        .data![
+                                                                            index]
+                                                                        .deliveryPhone
+                                                                        .toString());
+                                                              }
+                                                            : () {
+                                                                Utilis.error_flushbar_message(
+                                                                    context,
+                                                                    'Will be available after 48 hours');
+                                                              },
                                                         child: const Image(
                                                           image: AssetImage(
                                                               'assets/phone.png'),
@@ -691,11 +730,10 @@ class _Order_DetailState extends State<Order_Detail> {
                                 ),
                               );
                             }
-                            return Center(
-                                child: SizedBox(
-                                    height: height,
-                                    child: const Center(
-                                        child: CircularProgressIndicator())));
+                            return SizedBox(
+                                height: height,
+                                child: const Center(
+                                    child: CircularProgressIndicator( color:BC.blue)));
                           },
                         ),
                       ],
@@ -730,10 +768,11 @@ class _Order_DetailState extends State<Order_Detail> {
                           }),
                           InkWell(
                             onTap: () {
+                              data.setAPIData(dataList);
                               if (kDebugMode) {
                                 print(data.status);
                               }
-                              dialogBox(context);
+                              dialogBox(context, data);
                             },
                             child: Container(
                                 width: width * 0.2,
@@ -764,8 +803,8 @@ class _Order_DetailState extends State<Order_Detail> {
     );
   }
 
-  dialogBox(BuildContext context) {
-    DataViewViewModel data = DataViewViewModel();
+  dialogBox(BuildContext context, data) {
+    GetImageData get = GetImageData();
     return showDialog(
         barrierColor: Colors.white.withOpacity(0.9),
         context: context,
@@ -797,7 +836,7 @@ class _Order_DetailState extends State<Order_Detail> {
                               IconImage: 'assets/add.png'),
                           Card_Components(
                               onPress: () {
-                                print(data.data);
+                                get.fun(data, context);
                                 Navigator.pushNamed(context, RoutesName.photo);
                               },
                               title: "Photo",

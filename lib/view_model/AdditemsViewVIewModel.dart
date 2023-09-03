@@ -79,7 +79,7 @@ class ItemViewViewModel with ChangeNotifier {
   }
 
   void saveitem(String item) {
-    if (item == 'Select Item' && _savedItem.contains(item)) {
+    if (item == 'Select Item' || _savedItem.contains(item)) {
     } else {
       _savedItem.add(item);
       _savedItem.reversed;

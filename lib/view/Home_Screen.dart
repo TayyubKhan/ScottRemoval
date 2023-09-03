@@ -1,10 +1,10 @@
 // ignore_for_file: use_build_context_synchronously
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:scotremovals/repository/home_repo.dart';
-import 'package:scotremovals/view/signature_view.dart';
 import 'package:scotremovals/view_model/ExtraItemFloorViewModel.dart';
 import 'package:scotremovals/view_model/dataViewModel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -59,7 +59,6 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
     final exit = Provider.of<ExtraItemViewViewModel>(context, listen: true);
     var height = MediaQuery.sizeOf(context).height;
     var width = MediaQuery.sizeOf(context).width;
-    final signature = Provider.of<SignatureProvider>(context, listen: false);
     return WillPopScope(
       onWillPop: () async {
         // Return true to allow back navigation, or false to disable it
@@ -177,7 +176,7 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                             handle();
                             return shows == true
                                 ? SizedBox(
-                                    height: height * 0.5,
+                                    height: height,
                                     child: const Center(
                                         child: CircularProgressIndicator(
                                       color: BC.blue,
@@ -208,17 +207,27 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                 SharedPreferences sp =
                                                     await SharedPreferences
                                                         .getInstance();
-                                                print('fsafsaf');
-                                                print(
-                                                    sp.get('email').toString());
-
+                                                sp.setString(
+                                                    'orderId',
+                                                    snapshot
+                                                        .data!.data![index].id);
+                                                sp.setString(
+                                                    'user_id',
+                                                    snapshot.data!.data![index]
+                                                        .userId
+                                                        .toString());
+                                                if (snapshot.data!.orderCount !=
+                                                    dvv.signature.length) {
+                                                  log('created');
+                                                  dvv.createwavdata(snapshot
+                                                      .data!.orderCount);
+                                                }
                                                 if (sp
                                                         .get('orderId')
                                                         .toString() !=
                                                     snapshot
                                                         .data!.data![index].id
                                                         .toString()) {
-                                                  signature.setshow(true);
                                                   it.clear();
                                                   exit.clear();
                                                 }
@@ -226,11 +235,6 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                     'orderId',
                                                     snapshot
                                                         .data!.data![index].id);
-                                                // await pk.PickupApi(context, '0',
-                                                //     sp.get('orderId').toString());
-                                                // await dr.DropApi(context, '0',
-                                                //     sp.get('orderId').toString());
-                                                // sp.remove('orderId');
                                                 dvv.setIndex(index);
                                                 dvv.setStatus(true);
                                                 String desc =
@@ -245,6 +249,7 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                       .toString(),
                                                   index.toString(),
                                                 ]);
+
                                                 Navigator.pushNamed(context,
                                                     RoutesName.singleOrder);
                                               },
@@ -266,7 +271,7 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                     Container(
                                                       width: width * 0.96,
                                                       padding: const EdgeInsets
-                                                              .symmetric(
+                                                          .symmetric(
                                                           horizontal: 20,
                                                           vertical: 5),
                                                       child: Column(
@@ -299,7 +304,7 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                                 ),
                                                                 Container(
                                                                   padding: const EdgeInsets
-                                                                          .symmetric(
+                                                                      .symmetric(
                                                                       horizontal:
                                                                           10,
                                                                       vertical:
@@ -331,7 +336,7 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                               child: Container(
                                                                 padding:
                                                                     const EdgeInsets
-                                                                            .only(
+                                                                        .only(
                                                                         right:
                                                                             10),
                                                                 width: MediaQuery.of(
@@ -408,7 +413,6 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                         .toString()) {
                                                   print('created');
 
-                                                  signature.setshow(true);
                                                   it.clear();
                                                   exit.clear();
                                                 }
@@ -457,7 +461,7 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                     Container(
                                                       width: width * 0.96,
                                                       padding: const EdgeInsets
-                                                              .symmetric(
+                                                          .symmetric(
                                                           horizontal: 20,
                                                           vertical: 5),
                                                       child: Column(
@@ -490,7 +494,7 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                                 ),
                                                                 Container(
                                                                   padding: const EdgeInsets
-                                                                          .symmetric(
+                                                                      .symmetric(
                                                                       horizontal:
                                                                           10,
                                                                       vertical:
@@ -522,7 +526,7 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                               child: Container(
                                                                 padding:
                                                                     const EdgeInsets
-                                                                            .only(
+                                                                        .only(
                                                                         right:
                                                                             10),
                                                                 width: MediaQuery.of(
@@ -603,7 +607,6 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                     snapshot
                                                         .data!.data![index].id
                                                         .toString()) {
-                                                  signature.setshow(true);
                                                   it.clear();
                                                   exit.clear();
                                                 }
@@ -651,7 +654,7 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                     Container(
                                                       width: width * 0.96,
                                                       padding: const EdgeInsets
-                                                              .symmetric(
+                                                          .symmetric(
                                                           horizontal: 20,
                                                           vertical: 5),
                                                       child: Column(
@@ -684,7 +687,7 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                                 ),
                                                                 Container(
                                                                   padding: const EdgeInsets
-                                                                          .symmetric(
+                                                                      .symmetric(
                                                                       horizontal:
                                                                           10,
                                                                       vertical:
@@ -716,7 +719,7 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                               child: Container(
                                                                 padding:
                                                                     const EdgeInsets
-                                                                            .only(
+                                                                        .only(
                                                                         right:
                                                                             10),
                                                                 width: MediaQuery.of(
@@ -792,15 +795,10 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                         .data!.data![index].id
                                                         .toString()) {
                                                   print('created');
-
-                                                  signature.setshow(true);
                                                   it.clear();
                                                   exit.clear();
                                                 }
-                                                sp.setString(
-                                                    'orderId',
-                                                    snapshot
-                                                        .data!.data![index].id);
+
                                                 // await pk.PickupApi(context, '0',
                                                 //     sp.get('orderId').toString());
                                                 // await dr.DropApi(context, '0',
@@ -808,7 +806,6 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                 // sp.remove('orderId');
                                                 dvv.setIndex(index);
                                                 dvv.setStatus(false);
-
                                                 String desc =
                                                     '${snapshot.data!.data![index].orderType.toString()}(est. ${snapshot.data!.data![index].productVolume.toString()},${snapshot.data!.data![index].persons.toString()} men)';
                                                 dvv.clear();
@@ -842,7 +839,7 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                     Container(
                                                       width: width * 0.96,
                                                       padding: const EdgeInsets
-                                                              .symmetric(
+                                                          .symmetric(
                                                           horizontal: 20,
                                                           vertical: 5),
                                                       child: Column(
@@ -875,7 +872,7 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                                 ),
                                                                 Container(
                                                                   padding: const EdgeInsets
-                                                                          .symmetric(
+                                                                      .symmetric(
                                                                       horizontal:
                                                                           10,
                                                                       vertical:
@@ -907,7 +904,7 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                               child: Container(
                                                                 padding:
                                                                     const EdgeInsets
-                                                                            .only(
+                                                                        .only(
                                                                         right:
                                                                             10),
                                                                 width: MediaQuery.of(
@@ -975,370 +972,6 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                   }
                                 }),
                               ),
-                              // ListView.builder(
-                              //   physics: const NeverScrollableScrollPhysics(),
-                              //   shrinkWrap: true,
-                              //   padding:
-                              //       const EdgeInsets.symmetric(vertical: 10),
-                              //   itemCount: snapshot.data!.orderCount,
-                              //   itemBuilder: ((context, index) {
-                              //     String id =
-                              //         snapshot.data!.data![index].id.toString();
-                              //     if (searchcontroller.text.isEmpty) {
-                              //       return Column(
-                              //         children: [
-                              //           InkWell(
-                              //             onTap: () async {
-                              //               SharedPreferences sp =
-                              //                   await SharedPreferences
-                              //                       .getInstance();
-                              //
-                              //               if (sp.get('orderId').toString() !=
-                              //                   snapshot.data!.data![index].id
-                              //                       .toString()) {
-                              //                 print('created');
-                              //
-                              //                 signature.setshow(true);
-                              //                 it.clear();
-                              //                 exit.clear();
-                              //               }
-                              //               sp.setString('orderId',
-                              //                   snapshot.data!.data![index].id);
-                              //               // await pk.PickupApi(context, '0',
-                              //               //     sp.get('orderId').toString());
-                              //               // await dr.DropApi(context, '0',
-                              //               //     sp.get('orderId').toString());
-                              //               // sp.remove('orderId');
-                              //               dvv.setIndex(index);
-                              //               dvv.setStatus(false);
-                              //
-                              //               String desc =
-                              //                   '${snapshot.data!.data![index].orderType.toString()}(est. ${snapshot.data!.data![index].productVolume.toString()},${snapshot.data!.data![index].persons.toString()} men)';
-                              //               dvv.clear();
-                              //               dvv.setData([
-                              //                 snapshot.data!.data![index]
-                              //                     .deliveryAddress
-                              //                     .toString(),
-                              //                 desc.toString(),
-                              //                 snapshot.data!.data![index].id
-                              //                     .toString(),
-                              //                 index.toString(),
-                              //               ]);
-                              //               Navigator.pushNamed(context,
-                              //                   RoutesName.singleOrder);
-                              //             },
-                              //             child: IntrinsicHeight(
-                              //               child: Row(
-                              //                 children: [
-                              //                   Container(
-                              //                     width: 8,
-                              //                     decoration: BoxDecoration(
-                              //                         color:
-                              //                             selectedIndex == index
-                              //                                 ? BC.green
-                              //                                 : BC.white,
-                              //                         borderRadius:
-                              //                             BorderRadius.circular(
-                              //                                 5)),
-                              //                   ),
-                              //                   Container(
-                              //                     width: width * 0.96,
-                              //                     padding: const EdgeInsets
-                              //                             .symmetric(
-                              //                         horizontal: 20,
-                              //                         vertical: 5),
-                              //                     child: Column(
-                              //                         crossAxisAlignment:
-                              //                             CrossAxisAlignment
-                              //                                 .start,
-                              //                         children: [
-                              //                           Row(
-                              //                             mainAxisAlignment:
-                              //                                 MainAxisAlignment
-                              //                                     .spaceBetween,
-                              //                             children: [
-                              //                               Text(
-                              //                                 snapshot
-                              //                                     .data!
-                              //                                     .data![index]
-                              //                                     .orderId
-                              //                                     .toString(),
-                              //                                 style: TextStyle(
-                              //                                   fontFamily:
-                              //                                       "HelveticaRegular",
-                              //                                   color: BC
-                              //                                       .lightGrey,
-                              //                                   fontSize:
-                              //                                       width *
-                              //                                           0.038,
-                              //                                 ),
-                              //                               ),
-                              //                               Container(
-                              //                                 padding: const EdgeInsets
-                              //                                         .symmetric(
-                              //                                     horizontal:
-                              //                                         10,
-                              //                                     vertical: 5),
-                              //                                 decoration: BoxDecoration(
-                              //                                     color: Colors
-                              //                                         .red,
-                              //                                     borderRadius:
-                              //                                         BorderRadius
-                              //                                             .circular(
-                              //                                                 15)),
-                              //                                 child: Center(
-                              //                                   child: Text(
-                              //                                     'Drop Off',
-                              //                                     style: TextStyle(
-                              //                                         color: BC
-                              //                                             .white,
-                              //                                         fontSize:
-                              //                                             width *
-                              //                                                 0.036),
-                              //                                   ),
-                              //                                 ),
-                              //                               ),
-                              //                             ],
-                              //                           ),
-                              //                           SizedBox(
-                              //                             height: height * 0.01,
-                              //                           ),
-                              //                           Expanded(
-                              //                             child: Container(
-                              //                               padding:
-                              //                                   const EdgeInsets
-                              //                                           .only(
-                              //                                       right: 10),
-                              //                               width:
-                              //                                   MediaQuery.of(
-                              //                                           context)
-                              //                                       .size
-                              //                                       .width,
-                              //                               child: Text(
-                              //                                 snapshot
-                              //                                     .data!
-                              //                                     .data![index]
-                              //                                     .deliveryAddress
-                              //                                     .toString(),
-                              //                                 maxLines: 2,
-                              //                                 overflow:
-                              //                                     TextOverflow
-                              //                                         .ellipsis,
-                              //                                 style: TextStyle(
-                              //                                   fontFamily:
-                              //                                       "HelveticaBold",
-                              //                                   color: Colors
-                              //                                       .black,
-                              //                                   fontSize:
-                              //                                       width *
-                              //                                           0.05,
-                              //                                   fontWeight:
-                              //                                       FontWeight
-                              //                                           .w600,
-                              //                                 ),
-                              //                               ),
-                              //                             ),
-                              //                           ),
-                              //                           SizedBox(
-                              //                             height: height * 0.01,
-                              //                           ),
-                              //                           Text(
-                              //                             '${snapshot.data!.data![index].orderType.toString()}(est. ${snapshot.data!.data![index].productVolume.toString()} m3,${snapshot.data!.data![index].persons.toString()} men)',
-                              //                             style: TextStyle(
-                              //                               fontFamily:
-                              //                                   "HelveticaRegular",
-                              //                               color: Colors.black,
-                              //                               fontSize:
-                              //                                   width * 0.036,
-                              //                             ),
-                              //                           ),
-                              //                         ]),
-                              //                   ),
-                              //                 ],
-                              //               ),
-                              //             ),
-                              //           ),
-                              //           const Divider(
-                              //             thickness: 2,
-                              //           )
-                              //         ],
-                              //       );
-                              //     } else if (id
-                              //         .contains(searchcontroller.text)) {
-                              //       return Column(
-                              //         children: [
-                              //           InkWell(
-                              //             onTap: () async {
-                              //               setState(() {
-                              //                 selectedIndex = index;
-                              //               });
-                              //               SharedPreferences sp =
-                              //                   await SharedPreferences
-                              //                       .getInstance();
-                              //               sp.setString('orderId',
-                              //                   snapshot.data!.data![index].id);
-                              //               String desc =
-                              //                   '${snapshot.data!.data![index].orderType.toString()}(est. ${snapshot.data!.data![index].productVolume.toString()},${snapshot.data!.data![index].persons.toString()} men)';
-                              //               dvv.clear();
-                              //               dvv.setData([
-                              //                 snapshot.data!.data![index]
-                              //                     .deliveryAddress
-                              //                     .toString(),
-                              //                 desc.toString(),
-                              //                 snapshot.data!.data![index].id
-                              //                     .toString(),
-                              //                 index.toString()
-                              //               ]);
-                              //
-                              //               Navigator.pushNamed(context,
-                              //                   RoutesName.singleOrder);
-                              //             },
-                              //             child: SizedBox(
-                              //               width: width,
-                              //               height: height * 0.1,
-                              //               child: Row(
-                              //                 children: [
-                              //                   Container(
-                              //                     width: 8,
-                              //                     decoration: BoxDecoration(
-                              //                         color:
-                              //                             selectedIndex == index
-                              //                                 ? BC.green
-                              //                                 : BC.white,
-                              //                         borderRadius:
-                              //                             BorderRadius.circular(
-                              //                                 5)),
-                              //                   ),
-                              //                   Container(
-                              //                     width: width * 0.96,
-                              //                     padding: const EdgeInsets
-                              //                             .symmetric(
-                              //                         horizontal: 20,
-                              //                         vertical: 5),
-                              //                     child: Column(
-                              //                         crossAxisAlignment:
-                              //                             CrossAxisAlignment
-                              //                                 .start,
-                              //                         children: [
-                              //                           Row(
-                              //                             mainAxisAlignment:
-                              //                                 MainAxisAlignment
-                              //                                     .spaceBetween,
-                              //                             children: [
-                              //                               Text(
-                              //                                 snapshot
-                              //                                     .data!
-                              //                                     .data![index]
-                              //                                     .orderId
-                              //                                     .toString(),
-                              //                                 style: TextStyle(
-                              //                                   fontFamily:
-                              //                                       "HelveticaRegular",
-                              //                                   color: BC
-                              //                                       .lightGrey,
-                              //                                   fontSize:
-                              //                                       width *
-                              //                                           0.038,
-                              //                                 ),
-                              //                               ),
-                              //                               Container(
-                              //                                 padding: const EdgeInsets
-                              //                                         .symmetric(
-                              //                                     horizontal:
-                              //                                         10,
-                              //                                     vertical: 5),
-                              //                                 decoration: BoxDecoration(
-                              //                                     color:
-                              //                                         BC.green,
-                              //                                     borderRadius:
-                              //                                         BorderRadius
-                              //                                             .circular(
-                              //                                                 15)),
-                              //                                 child: Center(
-                              //                                   child: Text(
-                              //                                     snapshot
-                              //                                         .data!
-                              //                                         .data![
-                              //                                             index]
-                              //                                         .orderStatus
-                              //                                         .toString(),
-                              //                                     style: TextStyle(
-                              //                                         color: BC
-                              //                                             .white,
-                              //                                         fontSize:
-                              //                                             width *
-                              //                                                 0.036),
-                              //                                   ),
-                              //                                 ),
-                              //                               ),
-                              //                             ],
-                              //                           ),
-                              //                           SizedBox(
-                              //                             height: height * 0.01,
-                              //                           ),
-                              //                           Expanded(
-                              //                             child: Container(
-                              //                               padding:
-                              //                                   const EdgeInsets
-                              //                                           .only(
-                              //                                       right: 10),
-                              //                               width:
-                              //                                   MediaQuery.of(
-                              //                                           context)
-                              //                                       .size
-                              //                                       .width,
-                              //                               child: Text(
-                              //                                 snapshot
-                              //                                     .data!
-                              //                                     .data![index]
-                              //                                     .deliveryAddress
-                              //                                     .toString(),
-                              //                                 maxLines: 2,
-                              //                                 overflow:
-                              //                                     TextOverflow
-                              //                                         .ellipsis,
-                              //                                 style: TextStyle(
-                              //                                   fontFamily:
-                              //                                       "HelveticaBold",
-                              //                                   color: Colors
-                              //                                       .black,
-                              //                                   fontSize:
-                              //                                       width *
-                              //                                           0.05,
-                              //                                   fontWeight:
-                              //                                       FontWeight
-                              //                                           .w600,
-                              //                                 ),
-                              //                               ),
-                              //                             ),
-                              //                           ),
-                              //                           Text(
-                              //                             // 'Home Removals (est. 15.12 m3, 2 men)',
-                              //                             '${snapshot.data!.data![index].orderType.toString()}(est. ${snapshot.data!.data![index].productVolume.toString()} m3,${snapshot.data!.data![index].persons.toString()} men)',
-                              //                             style: TextStyle(
-                              //                               fontFamily:
-                              //                                   "HelveticaRegular",
-                              //                               color: Colors.black,
-                              //                               fontSize:
-                              //                                   width * 0.036,
-                              //                             ),
-                              //                           ),
-                              //                         ]),
-                              //                   ),
-                              //                 ],
-                              //               ),
-                              //             ),
-                              //           ),
-                              //           const Divider(
-                              //             thickness: 2,
-                              //           )
-                              //         ],
-                              //       );
-                              //     } else {
-                              //       return const SizedBox();
-                              //     }
-                              //   }),
-                              // )
                             ],
                           );
                         }),

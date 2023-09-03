@@ -2,11 +2,9 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:scotremovals/res/app_url.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class WithoutModelRepo {
   Future<dynamic> fetchOrderDetails() async {
-    SharedPreferences sp = await SharedPreferences.getInstance();
     var jsonResponse;
     try {
       var request =

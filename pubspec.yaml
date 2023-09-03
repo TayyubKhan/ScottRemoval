@@ -47,6 +47,7 @@ dependencies:
   camera: ^0.10.3+2
   image_picker: ^0.8.7+1
   url_launcher: ^6.1.10
+  path_provider:
   google_maps_flutter: ^2.2.5
   flutter_signature_pad: ^3.0.1
   hand_signature: ^3.0.1

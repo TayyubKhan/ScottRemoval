@@ -1,10 +1,10 @@
 // ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:scotremovals/repository/floor_repo.dart';
 import 'package:scotremovals/res/Components/Rounded_Button.dart';
 import 'package:scotremovals/view_model/AdditemsViewVIewModel.dart';
+import 'package:scotremovals/view_model/dataViewModel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../repository/updateItemRepo.dart';
@@ -22,11 +22,13 @@ class Add_Items_View extends StatefulWidget {
 late String _selectedFloor;
 
 class _Add_Items_ViewState extends State<Add_Items_View> {
+  int id = 0;
   void initState() {
     super.initState();
     _selectedFloor = 'Select Item';
   }
 
+  bool add = false;
   UpdateItemRepo up = UpdateItemRepo();
   final FocusNode _focusNode = FocusNode();
   String selectedOption = '';
@@ -40,16 +42,15 @@ class _Add_Items_ViewState extends State<Add_Items_View> {
     '5th Floor',
   ];
   List<String> filteredOptions = [];
-
   FloorAndItemRepo floorAndItemRepo = FloorAndItemRepo();
   @override
   bool get wantKeepAlive => true;
   Widget build(BuildContext context) {
     UpdateItemRepo up = UpdateItemRepo();
     final it = Provider.of<ItemViewViewModel>(context, listen: true);
+    final data = Provider.of<DataViewViewModel>(context, listen: true);
     var height = MediaQuery.of(context).size.height * 1;
     var width = MediaQuery.of(context).size.width * 1;
-
     return WillPopScope(
       onWillPop: () async {
         Navigator.pushNamed(context, RoutesName.singleOrder);
@@ -139,6 +140,7 @@ class _Add_Items_ViewState extends State<Add_Items_View> {
                                       j++) {
                                     if (ItemModel.dropDownIList[j]
                                         .contains(ItemModel.savedItem[i])) {
+                                      print('id' + j.toString());
                                       ItemModel.getsavedid(j);
                                     }
                                   }
@@ -328,14 +330,34 @@ class _Add_Items_ViewState extends State<Add_Items_View> {
                                 "parent": "498",
                                 "parent_name": ""
                               };
-                              updateItem.add(item);
+                              for (int j = 0; j < data.dataList.length; j++) {
+                                String id = data.dataList[j]['name'].toString();
+                                if (it.savedItem[i] == id) {
+                                  add = false;
+                                  print(data.dataList[j]["quantity"]);
+                                  int quantity = int.parse(
+                                          it.counters[i].value.toString()) +
+                                      int.parse(data.dataList[j]["quantity"]);
+                                  data.dataList[j]["quantity"] =
+                                      quantity.toString();
+                                  print(data.dataList[j]["quantity"]);
+                                  break;
+                                } else {
+                                  add = true;
+                                  continue;
+                                }
+                              }
+                              if (add == true) {
+                                updateItem.add(item);
+                              }
                             }
+                            print(data.dataList);
+                            updateItem.addAll(data.dataList);
                             it.addlist();
                             value.setLoading(true);
-                            var valid = await up.UpdateItemAPI(context,
+                            await up.UpdateItemAPI(context,
                                 sp.get('orderId').toString(), updateItem);
                             value.setLoading(false);
-                            print(sp.get('orderId').toString());
                             Navigator.pushNamed(
                                 context, RoutesName.singleOrder);
 

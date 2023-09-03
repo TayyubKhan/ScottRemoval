@@ -22,10 +22,24 @@ class Waiver_Form_View extends StatefulWidget {
 
 class _Waiver_Form_ViewState extends State<Waiver_Form_View> {
   Waive_Form_Repository wf = Waive_Form_Repository();
-  DataViewViewModel data = DataViewViewModel();
-  TextEditingController _controller = TextEditingController();
+  String text = 'adfasdf';
+  TextEditingController _controller = TextEditingController(text: 'a');
+  DataViewViewModel d = DataViewViewModel();
+  @override
+  void initState() {
+    super.initState();
+    // TODO: implement initState
+    final dataa = Provider.of<DataViewViewModel>(context, listen: false);
+    if (dataa.wavdata[dataa.index] != null) {
+      if (dataa.wavdata[dataa.index] != '') {
+        _controller = TextEditingController(text: dataa.wavdata[dataa.index]);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final data = Provider.of<DataViewViewModel>(context, listen: true);
     var height = MediaQuery.of(context).size.height * 1;
     var width = MediaQuery.of(context).size.width * 1;
     return WillPopScope(
@@ -89,19 +103,22 @@ class _Waiver_Form_ViewState extends State<Waiver_Form_View> {
                         const SizedBox(
                           height: 20,
                         ),
-                        TextFormField(
-                          controller: _controller,
-                          keyboardType: TextInputType.name,
-                          maxLines: 10,
-                          style: TextStyle(
-                            fontFamily: "HelveticaRegular",
-                            fontSize: width * 0.048,
-                          ),
-                          decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          )),
-                        ),
+                        Consumer<DataViewViewModel>(
+                            builder: (context, value, child) {
+                          return TextFormField(
+                            controller: _controller,
+                            keyboardType: TextInputType.name,
+                            maxLines: 10,
+                            style: TextStyle(
+                              fontFamily: "HelveticaRegular",
+                              fontSize: width * 0.048,
+                            ),
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            )),
+                          );
+                        }),
                         SizedBox(
                           height: height * 0.33,
                         ),
@@ -122,8 +139,8 @@ class _Waiver_Form_ViewState extends State<Waiver_Form_View> {
                                           .waiverFormApi(
                                               context,
                                               AppUrl.waiverFormApiEndPoint,
-                                              _controller.toString(),
-                                              sp.get('id').toString())
+                                              _controller.text.toString(),
+                                              sp.get('orderId').toString()!)
                                           .onError((error, stackTrace) => {
                                                 Utilis.error_flushbar_message(
                                                     context, error.toString())

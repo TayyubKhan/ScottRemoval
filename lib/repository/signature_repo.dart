@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -37,9 +38,7 @@ class SignatureRepo {
       final response =
           await request.send().timeout(const Duration(seconds: 10));
       dynamic jsonResponse = json.decode(await response.stream.bytesToString());
-      if (kDebugMode) {
-        print(jsonResponse);
-      }
+      log("Signture status:"+jsonResponse.toString());
       if (jsonResponse['status'] == 200) {
         Utilis.Snackbar_Message(context, 'Submitted');
         myrepo.setLoading(false);

@@ -46,7 +46,7 @@ class _MyDrawerState extends State<MyDrawer> {
       child: ListView(
         children: [
           UserAccountsDrawerHeader(
-            decoration: BoxDecoration(color: BC.login),
+            decoration: const BoxDecoration(color: BC.login),
             currentAccountPicture: GestureDetector(
               // onTap: () {
               //   Navigator.of(context).push(MaterialPageRoute(
@@ -56,7 +56,7 @@ class _MyDrawerState extends State<MyDrawer> {
               child: CircleAvatar(
                 child:
                     Image.network(image, errorBuilder: (context, error, stack) {
-                  return Icon(Icons.error);
+                  return const Icon(Icons.error);
                 }),
               ),
             ),
@@ -72,7 +72,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 Drawer_ROW(
                   icon: ImageIcon(
                     size: height * 0.04,
-                    AssetImage('assets/go.png'),
+                    const AssetImage('assets/go.png'),
                     color: Colors.white,
                   ),
                   title: 'My Order',
@@ -92,7 +92,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 Drawer_ROW(
                   icon: ImageIcon(
                     size: height * 0.04,
-                    AssetImage('assets/call.png'),
+                    const AssetImage('assets/call.png'),
                     color: Colors.white,
                   ),
                   title: 'Call Office',
@@ -112,7 +112,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 Drawer_ROW(
                   icon: ImageIcon(
                     size: height * 0.04,
-                    AssetImage('assets/comment.png'),
+                    const AssetImage('assets/comment.png'),
                     color: Colors.white,
                   ),
                   title: 'Message',
@@ -132,7 +132,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 Drawer_ROW(
                   icon: ImageIcon(
                     size: height * 0.04,
-                    AssetImage('assets/history.png'),
+                    const AssetImage('assets/history.png'),
                     color: Colors.white,
                   ),
                   title: 'History',
@@ -150,7 +150,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 Drawer_ROW(
                   icon: ImageIcon(
                     size: height * 0.04,
-                    AssetImage('assets/send.png'),
+                    const AssetImage('assets/send.png'),
                     color: Colors.white,
                   ),
                   title: 'Send feedback',
@@ -170,7 +170,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 Drawer_ROW(
                   icon: ImageIcon(
                     size: height * 0.04,
-                    AssetImage('assets/set.png'),
+                    const AssetImage('assets/set.png'),
                     color: Colors.white,
                   ),
                   title: 'Set Availability',
@@ -191,7 +191,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 Drawer_ROW(
                   icon: ImageIcon(
                     size: height * 0.04,
-                    AssetImage('assets/performence.png'),
+                    const AssetImage('assets/performence.png'),
                     color: Colors.white,
                   ),
                   title: 'Preferences',
@@ -206,7 +206,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 Drawer_ROW(
                   icon: ImageIcon(
                     size: height * 0.04,
-                    AssetImage('assets/about.png'),
+                    const AssetImage('assets/about.png'),
                     color: Colors.white,
                   ),
                   title: 'About',
@@ -227,7 +227,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 Drawer_ROW(
                   icon: ImageIcon(
                     size: height * 0.04,
-                    AssetImage('assets/logout.png'),
+                    const AssetImage('assets/logout.png'),
                     color: Colors.white,
                   ),
                   title: 'Log Out',

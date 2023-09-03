@@ -4,13 +4,12 @@ import 'package:http/http.dart' as http;
 import 'package:scotremovals/res/app_url.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class FloorAndItemRepo {
-  Future<dynamic> GetItemsDetails() async {
+class ExtraItemRepo {
+  Future<dynamic> getExtraItemRepo(String url) async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     var jsonResponse;
     try {
-      var request =
-          http.MultipartRequest('POST', Uri.parse(AppUrl.getItemsApiEndP));
+      var request = http.MultipartRequest('POST', Uri.parse(url));
       request.headers.addAll({
         'Cookie': sp.getString('cookie').toString(),
         'Cache-Control': 'no-cache',
