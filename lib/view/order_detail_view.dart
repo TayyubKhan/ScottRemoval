@@ -160,9 +160,8 @@ class _Order_DetailState extends State<Order_Detail> {
                       color: BC.white),
                 );
               }
-              return const Center(child: CircularProgressIndicator(
-                color:BC.blue
-              ));
+              return const Center(
+                  child: CircularProgressIndicator(color: BC.blue));
             },
           ),
           centerTitle: true,
@@ -185,46 +184,67 @@ class _Order_DetailState extends State<Order_Detail> {
                         FutureBuilder<WonJobModel>(
                           future: homeRepository.fetchData(context),
                           builder: (BuildContext context, snapshot) {
-                            if (snapshot.hasData) {
-                              try {
-                                startlatlng = LatLng(
-                                    double.parse(snapshot
-                                        .data!.data![index].pickupLatitude!),
-                                    double.parse(snapshot
-                                        .data!.data![index].pickupLongitude!));
-                                destlatlng = LatLng(
-                                    double.parse(snapshot
-                                        .data!.data![index].dropLatitude!),
-                                    double.parse(snapshot
-                                        .data!.data![index].dropLongitude!));
-                              } catch (e) {
-                                startlatlng = const LatLng(0.00, 0.00);
-                                destlatlng = const LatLng(0.00, 0.00);
-                              }
-                              if (kDebugMode) {
-                                print(destlatlng.latitude);
-                              }
-                              List<Map<String, dynamic>> dt = [];
-                              if (snapshot.data!.data![index].productsList!
-                                  .toString()
-                                  .isNotEmpty) {
-                                dt = List<Map<String, dynamic>>.from(jsonDecode(
-                                    snapshot.data!.data![index].productsList!
-                                        .toString()));
-                              }
-                              dataList = dt;
-                              total = 0;
-                              for (int j = 0; j < dataList.length; j++) {
-                                total =
-                                    total + int.parse(dataList[j]['quantity']);
+                            try {
+                              bool showProgress = true;
+
+                              Timer(const Duration(seconds: 20), () {
+                                if (snapshot.connectionState ==
+                                        ConnectionState.active ||
+                                    snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                  // If the Future is still ongoing after 20 seconds, change showProgress to false
+                                  setState(() {
+                                    showProgress = false;
+                                  });
+                                }
+                              });
+
+                              if (snapshot.connectionState ==
+                                  ConnectionState.done) {
+                                // Data has been loaded
+                                showProgress = false;
                               }
 
-                              _getPolylines();
-                              _addMarkers();
-                              log('${snapshot.data!.data![index].orderDate}T${snapshot.data!.data![index].strtTime}');
-                              return SizedBox(
-                                width: MediaQuery.of(context).size.width,
-                                child: IntrinsicHeight(
+                              if (snapshot.hasData) {
+                                try {
+                                  startlatlng = LatLng(
+                                      double.parse(snapshot
+                                          .data!.data![index].pickupLatitude!),
+                                      double.parse(snapshot.data!.data![index]
+                                          .pickupLongitude!));
+                                  destlatlng = LatLng(
+                                      double.parse(snapshot
+                                          .data!.data![index].dropLatitude!),
+                                      double.parse(snapshot
+                                          .data!.data![index].dropLongitude!));
+                                } catch (e) {
+                                  startlatlng = const LatLng(0.00, 0.00);
+                                  destlatlng = const LatLng(0.00, 0.00);
+                                }
+                                if (kDebugMode) {
+                                  print(destlatlng.latitude);
+                                }
+                                List<Map<String, dynamic>> dt = [];
+                                if (snapshot.data!.data![index].productsList!
+                                    .toString()
+                                    .isNotEmpty) {
+                                  dt = List<Map<String, dynamic>>.from(
+                                      jsonDecode(snapshot
+                                          .data!.data![index].productsList!
+                                          .toString()));
+                                }
+                                dataList = dt;
+                                total = 0;
+                                for (int j = 0; j < dataList.length; j++) {
+                                  total = total +
+                                      int.parse(dataList[j]['quantity']);
+                                }
+
+                                _getPolylines();
+                                _addMarkers();
+                                log('${snapshot.data!.data![index].orderDate}T${snapshot.data!.data![index].strtTime}');
+                                return SizedBox(
+                                  width: MediaQuery.of(context).size.width,
                                   child: Column(
                                     children: [
                                       Padding(
@@ -236,57 +256,59 @@ class _Order_DetailState extends State<Order_Detail> {
                                             alignment: Alignment.bottomRight,
                                             children: [
                                               GoogleMap(
-                                                gestureRecognizers: <Factory<
-                                                    OneSequenceGestureRecognizer>>{
-                                                  Factory<EagerGestureRecognizer>(
-                                                      () =>
-                                                          EagerGestureRecognizer()),
-                                                }.toSet(),
-                                                zoomControlsEnabled: false,
-                                                mapType: MapType.normal,
-                                                markers: _markers,
-                                                initialCameraPosition:
-                                                    CameraPosition(
-                                                        target: LatLng(
-                                                            startlatlng
-                                                                .latitude,
-                                                            startlatlng
-                                                                .longitude),
-                                                        zoom: 8),
-                                                polylines: _polylines,
-                                                onMapCreated:
-                                                    (GoogleMapController
-                                                        controller) async {
-                                                  dynamic imageResponse =
-                                                      await http.get(Uri.parse(
-                                                          'https://scotremovals.com/api/assets/order_signatures/${snapshot.data!.data![index].signature}'));
-                                                  if (imageResponse.bodyBytes !=
-                                                      null) {
-                                                    data.setSignatureBytes(
-                                                        imageResponse.bodyBytes,
+                                                  gestureRecognizers: <Factory<
+                                                      OneSequenceGestureRecognizer>>{
+                                                    Factory<EagerGestureRecognizer>(
+                                                        () =>
+                                                            EagerGestureRecognizer()),
+                                                  }.toSet(),
+                                                  zoomControlsEnabled: false,
+                                                  mapType: MapType.normal,
+                                                  markers: _markers,
+                                                  initialCameraPosition:
+                                                      CameraPosition(
+                                                          target: LatLng(
+                                                              startlatlng
+                                                                  .latitude,
+                                                              startlatlng
+                                                                  .longitude),
+                                                          zoom: 8),
+                                                  polylines: _polylines,
+                                                  onMapCreated:
+                                                      (GoogleMapController
+                                                          controller) async {
+                                                    dynamic imageResponse =
+                                                        await http.get(Uri.parse(
+                                                            'https://scotremovals.com/api/assets/order_signatures/${snapshot.data!.data![index].signature}'));
+                                                    if (imageResponse
+                                                            .bodyBytes !=
+                                                        null) {
+                                                      data.setSignatureBytes(
+                                                          imageResponse
+                                                              .bodyBytes,
+                                                          index);
+                                                    }
+                                                    dynamic response =
+                                                        await order
+                                                            .orderDetailApi(
+                                                                context);
+                                                    data.getdata(
+                                                        response['waiver_form'][
+                                                                response['waiver_form']
+                                                                        .length -
+                                                                    1]['waiver_description']
+                                                            .toString(),
                                                         index);
-                                                  }
-
-                                                  dynamic response = await order
-                                                      .orderDetailApi(context);
-                                                  data.getdata(
-                                                      response['waiver_form'][
-                                                              response['waiver_form']
-                                                                      .length -
-                                                                  1]['waiver_description']
-                                                          .toString(),
-                                                      index);
-                                                  data.getdata2(
-                                                      response['comments'][
-                                                              response['comments']
-                                                                      .length -
-                                                                  1]['messege']
-                                                          .toString(),
-                                                      index);
-                                                  _controller
-                                                      .complete(controller);
-                                                },
-                                              ),
+                                                    data.getdata2(
+                                                        response['comments'][
+                                                                response['comments']
+                                                                        .length -
+                                                                    1]['messege']
+                                                            .toString(),
+                                                        index);
+                                                    _controller
+                                                        .complete(controller);
+                                                  }),
                                               Padding(
                                                 padding:
                                                     const EdgeInsets.all(8.0),
@@ -727,13 +749,29 @@ class _Order_DetailState extends State<Order_Detail> {
                                       ),
                                     ],
                                   ),
-                                ),
-                              );
+                                );
+                              }
+                              if (showProgress) {
+                                // Show CircularProgressIndicator while loading
+                                return SizedBox(
+                                    height: height,
+                                    child: const Center(
+                                        child: CircularProgressIndicator(
+                                            color: BC.blue)));
+                              } else {
+                                return const Text(
+                                    'Check Your Internet Connection');
+                              }
+                            } catch (e) {
+                              return SizedBox(
+                                  height: height,
+                                  child: const Center(
+                                      child: Text(
+                                    'There is Issue from the server',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  )));
                             }
-                            return SizedBox(
-                                height: height,
-                                child: const Center(
-                                    child: CircularProgressIndicator( color:BC.blue)));
                           },
                         ),
                       ],

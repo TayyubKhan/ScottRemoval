@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
@@ -27,9 +26,7 @@ class GetImage {
       request.fields['order_id'] = sp.get('orderId').toString();
       var response = await request.send().timeout(const Duration(seconds: 10));
       dynamic jsonResponse = json.decode(await response.stream.bytesToString());
-      log(jsonResponse.toString());
       if (jsonResponse['status'] == 200) {
-        log(jsonResponse.toString());
         return jsonResponse;
       } else {
         return null;

@@ -1,7 +1,7 @@
 // ignore_for_file: use_build_context_synchronously, camel_case_types
 
-import 'dart:developer';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -14,8 +14,10 @@ import 'package:scotremovals/view_model/dataViewModel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../repository/GetImage.dart';
+import '../repository/imageupdaterepo.dart';
 import '../res/colors.dart';
 import '../utils/Routes/routes_name.dart';
+import '../utils/utilis.dart';
 import '../view_model/auth_view_model.dart';
 
 class Add_Photo_View extends StatefulWidget {
@@ -37,6 +39,7 @@ Future<dynamic> func(context) async {
 }
 
 class _Add_Photo_ViewState extends State<Add_Photo_View> {
+  final up = UpdateImage();
   @override
   void dispose() {
     // TODO: implement dispose
@@ -45,7 +48,10 @@ class _Add_Photo_ViewState extends State<Add_Photo_View> {
   }
 
   OrderImages orderImages = OrderImages();
-  List<File> imageFiles = [];
+  List<File> imageFiles = List<File>.filled(12, File(''));
+  List<File> imageFiles2 = [];
+
+  List<File> singleImage = [];
 
   @override
   Widget build(BuildContext context) {
@@ -84,17 +90,19 @@ class _Add_Photo_ViewState extends State<Add_Photo_View> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 List urls = [];
-
+                List imageID = [];
                 for (int i = 0; i < snapshot.data['data'].length; i++) {
                   String url = snapshot.data['base_url'].toString() +
                       snapshot.data['data'][i]['image_path'].toString() +
                       snapshot.data['data'][i]['image'].toString();
+                  String imageid = snapshot.data['data'][i]['id'].toString();
                   if (!urls.contains(url)) {
                     urls.add(url);
+                    imageID.add(imageid);
                   }
                 }
-
                 urls = urls.reversed.toList();
+                imageID = imageID.reversed.toList();
                 return Container(
                   padding: const EdgeInsets.all(20),
                   child: Column(
@@ -149,9 +157,11 @@ class _Add_Photo_ViewState extends State<Add_Photo_View> {
                                   setState(() {
                                     // If an image was captured, update the imageFiles list at the tapped index.
                                     if (imageFiles.length > index) {
-                                      imageFiles.insert(index, image);
+                                      imageFiles[index] = image;
                                     } else {
-                                      imageFiles.add(image);
+                                      imageFiles[index] = image;
+                                      imageFiles2.add(image);
+                                      // imageFiles.add(image);
                                     }
                                   });
                                 }
@@ -159,20 +169,132 @@ class _Add_Photo_ViewState extends State<Add_Photo_View> {
                               child: IntrinsicWidth(
                                 child: Container(
                                     color: Colors.white,
-                                    child: imageFiles.length > index ||
-                                            urls.length <= index
-                                        ? imageFiles.length > index
+                                    child: (urls.isNotEmpty &&
+                                            index < urls.length)
+                                        ? Stack(
+                                            alignment: Alignment.bottomRight,
+                                            children: [
+                                              GestureDetector(
+                                                  onTap: () {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return ImageDialog(
+                                                            urls[index]);
+                                                      },
+                                                    );
+                                                  },
+                                                  child: Image.network(
+                                                    urls[index],
+                                                    errorBuilder: (context,
+                                                        error, stack) {
+                                                      return const Photo_Component();
+                                                    },
+                                                  )),
+                                              PopupMenuButton(
+                                                  color: BC.blue,
+                                                  itemBuilder: (context) => [
+                                                        PopupMenuItem(
+                                                            child: ListTile(
+                                                          onTap: () async {
+                                                            SharedPreferences
+                                                                sp =
+                                                                await SharedPreferences
+                                                                    .getInstance();
+                                                            final camera = widget
+                                                                    .cameras
+                                                                    .isNotEmpty
+                                                                ? widget
+                                                                    .cameras[0]
+                                                                : null;
+                                                            File image =
+                                                                await Navigator.of(
+                                                                        context)
+                                                                    .push(
+                                                              MaterialPageRoute(
+                                                                builder: (context) =>
+                                                                    CameraComponent(
+                                                                        camera:
+                                                                            camera!),
+                                                              ),
+                                                            );
+                                                            Uint8List bytes;
+                                                            bytes = await image
+                                                                .readAsBytes();
+                                                            await up
+                                                                .updateOrderImage(
+                                                                    context,
+                                                                    image,
+                                                                    sp
+                                                                        .get(
+                                                                            'orderId')
+                                                                        .toString(),
+                                                                    imageID[
+                                                                        index])
+                                                                .then((value) {
+                                                              Utilis.Snackbar_Message(
+                                                                  context,
+                                                                  'Image Updated');
+                                                            }).onError((error,
+                                                                    stackTrace) {
+                                                              Utilis.Snackbar_ErrorMessage(
+                                                                  context,
+                                                                  'Error while updating');
+                                                            });
+                                                            setState(() {});
+                                                            Navigator.pop(
+                                                                context);
+                                                          },
+                                                          leading: const Text(
+                                                              'Update',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold)),
+                                                        )),
+                                                        PopupMenuItem(
+                                                            child: ListTile(
+                                                          onTap: () async {
+                                                            await up
+                                                                .deleteOrderImage(
+                                                                    context,
+                                                                    imageID[
+                                                                        index])
+                                                                .then((value) {
+                                                              Utilis.Snackbar_Message(
+                                                                  context,
+                                                                  'Image Deleted');
+                                                              imageID.removeAt(
+                                                                  index);
+                                                              urls.removeAt(
+                                                                  index);
+                                                            });
+                                                            Navigator.pop(
+                                                                context);
+                                                            setState(() {});
+                                                          },
+                                                          leading: const Text(
+                                                              'Delete',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold)),
+                                                        )),
+                                                      ]),
+                                            ],
+                                          )
+                                        : (index < imageFiles.length)
                                             ? Image.file(imageFiles[index],
                                                 errorBuilder:
                                                     (context, error, stack) {
                                                 return const Photo_Component();
                                               })
-                                            : const Photo_Component()
-                                        : Image.network(urls[index],
-                                            errorBuilder:
-                                                (context, error, stack) {
-                                            return const Photo_Component();
-                                          })),
+                                            : const Photo_Component()),
                               ),
                             );
                           },
@@ -187,13 +309,18 @@ class _Add_Photo_ViewState extends State<Add_Photo_View> {
                               height: height * 1,
                               title: "DONE",
                               onPress: () async {
-                                // value.setLoading(value.setLoading(!value.loading));
                                 SharedPreferences sp =
                                     await SharedPreferences.getInstance();
                                 value.setLoading(true);
-                                log(sp.get('orderId').toString());
+                                imageFiles2 = [];
+                                for (int i = 0; i < imageFiles.length; i++) {
+                                  bool value = await imageFiles[i].exists();
+                                  if (value == true) {
+                                    imageFiles2.add(imageFiles[i]);
+                                  }
+                                }
                                 await orderImages
-                                    .sendOrderImages(context, imageFiles,
+                                    .sendOrderImages(context, imageFiles2,
                                         sp.get('orderId').toString())
                                     .then((v) {
                                   value.setLoading(false);
@@ -224,3 +351,156 @@ class _Add_Photo_ViewState extends State<Add_Photo_View> {
     );
   }
 }
+
+class ImageDialog extends StatelessWidget {
+  final String imageUrl;
+
+  ImageDialog(this.imageUrl);
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: GestureDetector(
+        onTap: () {
+          // Close the dialog when tapped outside the image.
+          Navigator.of(context).pop();
+        },
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          child: Image.network(imageUrl),
+        ),
+      ),
+    );
+  }
+}
+
+// In your build method where you display the images:
+// Container(
+// color: Colors.white,
+// child: imageFiles.length > index ||
+// urls.length <= index
+// ? imageFiles.length > index
+// ? Image.file(imageFiles[index],
+// errorBuilder:
+// (context, error, stack) {
+// return const Photo_Component();
+// })
+//     : const Photo_Component()
+//     : Stack(
+// alignment: Alignment.bottomRight,
+// children: [
+// GestureDetector(
+// onTap: () {
+// showDialog(
+// context: context,
+// builder: (BuildContext
+// context) {
+// return ImageDialog(
+// urls[index]);
+// },
+// );
+// },
+// child: Image.network(
+// urls[index],
+// errorBuilder: (context,
+// error, stack) {
+// return const Photo_Component();
+// },
+// )),
+// PopupMenuButton(
+// color: BC.blue,
+// itemBuilder: (context) => [
+// PopupMenuItem(
+// child: ListTile(
+// onTap: () async {
+// SharedPreferences
+// sp =
+// await SharedPreferences
+//     .getInstance();
+// final camera = widget
+//     .cameras
+//     .isNotEmpty
+// ? widget
+//     .cameras[0]
+//     : null;
+// File image =
+// await Navigator.of(
+// context)
+//     .push(
+// MaterialPageRoute(
+// builder: (context) =>
+// CameraComponent(
+// camera:
+// camera!),
+// ),
+// );
+// Uint8List bytes;
+// bytes = await image
+//     .readAsBytes();
+// await up
+//     .updateOrderImage(
+// context,
+// image,
+// sp
+//     .get(
+// 'orderId')
+//     .toString(),
+// imageID[
+// index])
+//     .then((value) {
+// Utilis.Snackbar_Message(
+// context,
+// 'Image Updated');
+// }).onError((error,
+// stackTrace) {
+// Utilis.Snackbar_ErrorMessage(
+// context,
+// 'Error while updating');
+// });
+// setState(() {});
+// Navigator.pop(
+// context);
+// },
+// leading: const Text(
+// 'Update',
+// style: TextStyle(
+// color: Colors
+//     .white,
+// fontWeight:
+// FontWeight
+//     .bold)),
+// )),
+// PopupMenuItem(
+// child: ListTile(
+// onTap: () async {
+// await up
+//     .deleteOrderImage(
+// context,
+// imageID[
+// index])
+//     .then((value) {
+// Utilis.Snackbar_Message(
+// context,
+// 'Image Deleted');
+// imageID.removeAt(
+// index);
+// urls.removeAt(
+// index);
+// });
+// setState(() {});
+// Navigator.pop(
+// context);
+// },
+// leading: const Text(
+// 'Delete',
+// style: TextStyle(
+// color: Colors
+//     .white,
+// fontWeight:
+// FontWeight
+//     .bold)),
+// )),
+// ]),
+// ],
+// ))

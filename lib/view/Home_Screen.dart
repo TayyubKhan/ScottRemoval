@@ -21,7 +21,6 @@ import '../view_model/auth_view_model.dart';
 // ignore: camel_case_types
 class Home_screen_View extends StatefulWidget {
   const Home_screen_View({Key? key}) : super(key: key);
-
   @override
   State<Home_screen_View> createState() => _Home_screen_ViewState();
 }
@@ -250,7 +249,8 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                   index.toString(),
                                                 ]);
 
-                                                Navigator.pushNamed(context,
+                                                Navigator.pushReplacementNamed(
+                                                    context,
                                                     RoutesName.singleOrder);
                                               },
                                               child: IntrinsicHeight(
@@ -289,7 +289,7 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                                       .data!
                                                                       .data![
                                                                           index]
-                                                                      .orderId
+                                                                      .trackingID
                                                                       .toString(),
                                                                   style:
                                                                       TextStyle(
@@ -440,7 +440,8 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                       .toString(),
                                                   index.toString(),
                                                 ]);
-                                                Navigator.pushNamed(context,
+                                                Navigator.pushReplacementNamed(
+                                                    context,
                                                     RoutesName.singleOrder);
                                               },
                                               child: IntrinsicHeight(
@@ -479,7 +480,7 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                                       .data!
                                                                       .data![
                                                                           index]
-                                                                      .orderId
+                                                                      .trackingID
                                                                       .toString(),
                                                                   style:
                                                                       TextStyle(
@@ -633,7 +634,8 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                       .toString(),
                                                   index.toString(),
                                                 ]);
-                                                Navigator.pushNamed(context,
+                                                Navigator.pushReplacementNamed(
+                                                    context,
                                                     RoutesName.singleOrder);
                                               },
                                               child: IntrinsicHeight(
@@ -818,7 +820,8 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                                       .toString(),
                                                   index.toString(),
                                                 ]);
-                                                Navigator.pushNamed(context,
+                                                Navigator.pushReplacementNamed(
+                                                    context,
                                                     RoutesName.singleOrder);
                                               },
                                               child: IntrinsicHeight(

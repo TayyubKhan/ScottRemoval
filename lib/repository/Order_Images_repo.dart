@@ -47,6 +47,9 @@ class OrderImages {
           await request.send().timeout(const Duration(seconds: 100));
       final responseData = await response.stream.bytesToString();
       dynamic jsonResponse = json.decode(responseData);
+      print(
+          'adsjfhdkjfhakjsdfhkjldsahfkljdsahfkaljdshfkajdlshfkljadshfkdsaljfhdsaf');
+      print(jsonResponse);
       if (jsonResponse['status'] == 200) {
         // ignore: use_build_context_synchronously
         Utilis.Snackbar_Message(context, 'Submitted Successfully');
