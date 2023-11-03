@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -24,6 +26,7 @@ class HomeRepository {
       request.fields['login_token'] = sp.get('login_token').toString();
       var response = await request.send();
       jsonResponse = json.decode(await response.stream.bytesToString());
+      print('Calling');
       if (response.statusCode == 200) {
         return WonJobModel.fromJson(jsonResponse);
       } else {

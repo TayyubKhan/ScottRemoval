@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
-          // home: MapScreen()
+          // home: TempoScreen()
           initialRoute: RoutesName.splash,
           onGenerateRoute: Routes.Generate_Routes,
         ));

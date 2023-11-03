@@ -88,7 +88,6 @@ class UpdateImage {
       return true;
     } catch (e) {
       // ignore: use_build_context_synchronously
-      Utilis.Snackbar_ErrorMessage(context, e.toString());
       return false;
     }
   }

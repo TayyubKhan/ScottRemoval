@@ -49,7 +49,6 @@ class DropOutRepo {
         return false;
       }
     } catch (e) {
-      Utilis.Snackbar_ErrorMessage(context, e.toString());
       myrepo.setLoading(false);
       return false;
     }

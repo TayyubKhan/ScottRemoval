@@ -41,7 +41,6 @@ class Waive_Form_Repository {
         return false;
       }
     } catch (e) {
-      Utilis.Snackbar_ErrorMessage(context, e.toString());
       myrepo.setLoading(false);
       return false;
     }

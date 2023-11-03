@@ -35,6 +35,7 @@ Future<dynamic> func(context) async {
   GetImage image = GetImage();
   List<File> imageFiles = [];
   dynamic jsonResponse = await image.getImage(context);
+  print("fkdsfkjadshfkjdashflkjdashfkjdshfk" + jsonResponse.toString());
   return jsonResponse;
 }
 
@@ -88,21 +89,25 @@ class _Add_Photo_ViewState extends State<Add_Photo_View> {
           child: FutureBuilder(
             future: func(context),
             builder: (context, snapshot) {
-              if (snapshot.hasData) {
+              print(snapshot.data);
+              if (snapshot.connectionState == ConnectionState.done) {
                 List urls = [];
                 List imageID = [];
-                for (int i = 0; i < snapshot.data['data'].length; i++) {
-                  String url = snapshot.data['base_url'].toString() +
-                      snapshot.data['data'][i]['image_path'].toString() +
-                      snapshot.data['data'][i]['image'].toString();
-                  String imageid = snapshot.data['data'][i]['id'].toString();
-                  if (!urls.contains(url)) {
-                    urls.add(url);
-                    imageID.add(imageid);
+                if (snapshot.data['data'] != null) {
+                  for (int i = 0; i < snapshot.data['data'].length; i++) {
+                    String url = snapshot.data['base_url'].toString() +
+                        snapshot.data['data'][i]['image_path'].toString() +
+                        snapshot.data['data'][i]['image'].toString();
+                    String imageid = snapshot.data['data'][i]['id'].toString();
+                    if (!urls.contains(url)) {
+                      urls.add(url);
+                      imageID.add(imageid);
+                    }
                   }
+                  urls = urls.reversed.toList();
+                  imageID = imageID.reversed.toList();
                 }
-                urls = urls.reversed.toList();
-                imageID = imageID.reversed.toList();
+
                 return Container(
                   padding: const EdgeInsets.all(20),
                   child: Column(

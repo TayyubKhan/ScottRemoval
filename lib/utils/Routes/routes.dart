@@ -9,7 +9,6 @@ import 'package:scotremovals/view/extra_itemView.dart';
 import 'package:scotremovals/view/signature_view.dart';
 import 'package:scotremovals/view/waiverForm_View.dart';
 
-import '../../temp.dart';
 import '../../view/Home_Screen.dart';
 import '../../view/Login_screenView.dart';
 import '../../view/order_detail_view.dart';
@@ -51,10 +50,10 @@ class Routes {
       case RoutesName.addFloors:
         return MaterialPageRoute(
             builder: (BuildContext context) => Add_Floor_View());
-      case RoutesName.test:
-        return MaterialPageRoute(
-            builder: (BuildContext context) => const Temp());
       case RoutesName.extraitem:
+        return MaterialPageRoute(
+            builder: (BuildContext context) => Extra_Items_View());
+      case RoutesName.singleOrder:
         return MaterialPageRoute(
             builder: (BuildContext context) => Extra_Items_View());
       default:
