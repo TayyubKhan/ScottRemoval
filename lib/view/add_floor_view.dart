@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:scotremovals/utils/Routes/routes_name.dart';
-import 'package:scotremovals/utils/utilis.dart';
 import 'package:scotremovals/view_model/AdditemsViewVIewModel.dart';
 import 'package:scotremovals/view_model/ExtraItemFloorViewModel.dart';
 import 'package:scotremovals/view_model/auth_view_model.dart';
@@ -13,6 +12,8 @@ import '../res/Components/Rounded_Button.dart';
 import '../res/colors.dart';
 
 class Add_Floor_View extends StatefulWidget {
+  const Add_Floor_View({super.key});
+
   @override
   State<Add_Floor_View> createState() => _Add_Floor_ViewState();
 }
@@ -20,6 +21,7 @@ class Add_Floor_View extends StatefulWidget {
 late String _selectedFloor;
 
 class _Add_Floor_ViewState extends State<Add_Floor_View> {
+  @override
   String text = '';
   TextEditingController controller = TextEditingController();
   SlugListRepo slugListRepo = SlugListRepo();
@@ -27,23 +29,15 @@ class _Add_Floor_ViewState extends State<Add_Floor_View> {
   final FocusNode _focusNode = FocusNode();
   late String _itemValue = 'Select floor';
   final slugMap = {
-    'ground floor': 'ground',
-    'first floor': 'first',
-    'second floor': 'second',
-    'third floor': 'third',
-    'fourth floor': 'fourth',
-    'fifth floor': 'fifth',
-    'sixth floor': 'sixth',
+    'ground': 'Ground floor',
+    'first': 'First floor',
+    'second': 'Second floor',
+    'third': 'Third floor',
+    'fourth': 'Fourth floor',
+    'fifth': 'Fifth floor',
+    'sixth': 'Sixth floor',
   };
-  var list = [
-    'ground floor',
-    'first floor',
-    'second floor',
-    'third floor',
-    'fourth floor',
-    'fifth floor',
-    'sixth floor'
-  ];
+
   var itemList = [
     'Select floor',
     'Ground floor',
@@ -52,9 +46,11 @@ class _Add_Floor_ViewState extends State<Add_Floor_View> {
     'Third floor',
     'Fourth floor',
     'Fifth floor',
-    'sixth floor'
+    'Sixth floor'
   ];
+  String floor = '';
   bool mada = false;
+  bool isAgain = false;
   @override
   Widget build(BuildContext context) {
     final data = Provider.of<DataViewViewModel>(context);
@@ -64,7 +60,7 @@ class _Add_Floor_ViewState extends State<Add_Floor_View> {
     var width = MediaQuery.of(context).size.width * 1;
     return WillPopScope(
       onWillPop: () async {
-        Navigator.pushNamed(context, RoutesName.singleOrder);
+        Navigator.pushReplacementNamed(context, RoutesName.singleOrder);
         return false;
       },
       child: Scaffold(
@@ -72,7 +68,7 @@ class _Add_Floor_ViewState extends State<Add_Floor_View> {
           backgroundColor: BC.blue,
           leading: IconButton(
               onPressed: () {
-                Navigator.pushNamed(context, RoutesName.singleOrder);
+                Navigator.pushReplacementNamed(context, RoutesName.singleOrder);
               },
               icon: const Icon(
                 Icons.arrow_back_ios,
@@ -91,77 +87,68 @@ class _Add_Floor_ViewState extends State<Add_Floor_View> {
         body: Container(
           padding: const EdgeInsets.all(20),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextFormField(
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return Utilis.error_flushbar_message(
-                        context, 'Please Enter Floor name');
-                  } else if (itemList.any((floor) =>
-                      RegExp(floor, caseSensitive: false).hasMatch(value))) {
-                    return Utilis.error_flushbar_message(
-                        context, 'Please Enter valid Floor name');
-                  }
-                  return value;
-                },
-                controller: controller,
-                onSaved: (value) {
-                  text = value.toString();
-                },
-                keyboardType: TextInputType.name,
-                decoration: InputDecoration(
-                    hintText: data.status == true
-                        ? 'PickUp Location'
-                        : 'DropOff Location',
-                    hintStyle: const TextStyle(
-                      color: BC.lightGrey,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    )),
+              Text(
+                data.location[data.index]['pickup']!,
+                style: const TextStyle(
+                  fontFamily: 'HelveticaRegular',
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const SizedBox(
                 height: 10,
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: BC.lightGrey),
-                ),
-                child: DropdownButton(
-                    borderRadius: BorderRadius.circular(10),
-                    isExpanded: true,
-                    hint: const Text('Floors'),
-                    underline: const SizedBox(),
-                    icon: const Icon(
-                      Icons.keyboard_arrow_down,
-                    ),
-                    value: _itemValue,
-                    onChanged: (value) async {
-                      data.removeprice();
-                      setState(() {
-                        _itemValue = value!;
-                      });
-                      print(item.savedid.length);
-                      for (int i = 0; i < item.savedid.length; i++) {
-                        // ignore: non_constant_identifier_names
-                        dynamic Response = await slugListRepo.fetchWithPrices(
-                            controller.text,
-                            _itemValue,
+              Builder(builder: (context) {
+                if (isAgain == false) {
+                  data.removeprice();
+                  for (int i = 0; i < data.ids[data.index].length; i++) {
+                    slugListRepo
+                        .fetchWithPrices(
+                            data.location[data.index]['slug']!,
                             context,
-                            item.savedid[i]!);
-                        if (Response != null &&
-                            Response != 'No_product_item_found') {
-                          data.getPrice(double.parse(Response.toString()));
-                          // ignore: use_build_context_synchronously
-                        }
+                            int.parse(data.ids[data.index][i]['id'].toString()))
+                        .then((value) {
+                      if (value != null && value != 'No_product_item_found') {
+                        data.getPrice(double.parse(value.toString()));
                       }
-                    },
-                    items: itemList.map((value) {
-                      return DropdownMenuItem(value: value, child: Text(value));
-                    }).toList()),
-              ),
+                    });
+                    isAgain = true;
+                  }
+                }
+                floor = data.location[data.index]['slug']!;
+                List<String> floors = floor.split('_to_');
+                String initialFloor = floors.isNotEmpty ? floors.last : 'Select floor';
+                 _itemValue = slugMap[initialFloor] ?? 'Select floor';
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: BC.lightGrey),
+                  ),
+                  child: DropdownButton(
+                      borderRadius: BorderRadius.circular(10),
+                      isExpanded: true,
+                      hint: const Text('Floors'),
+                      underline: const SizedBox(),
+                      icon: const Icon(
+                        Icons.keyboard_arrow_down,
+                      ),
+                      value: _itemValue,
+                      onChanged: (value) async {
+                        data.removeprice();
+                        setState(() {
+                          _itemValue = value!;
+                        });
+                      },
+                      items: itemList.map((value) {
+                        return DropdownMenuItem(
+                            value: value, child: Text(value));
+                      }).toList()),
+                );
+              }),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -213,13 +200,10 @@ class _Add_Floor_ViewState extends State<Add_Floor_View> {
                       height: height * 1,
                       title: "DONE",
                       onPress: () async {
-                        if (controller.text.isNotEmpty) {
-                          Navigator.pushNamed(context, RoutesName.singleOrder);
-                        } else {
-                          Utilis.error_flushbar_message(
-                              context, 'Please Enter the Floor');
-                        }
-                        // Navigator.pushNamed(context, RoutesName.waiverForm);
+                          Navigator.pushReplacementNamed(
+                              context, RoutesName.singleOrder);
+
+                        // Navigator.pushReplacementNamed(context, RoutesName.waiverForm);
                       });
                 },
               )),

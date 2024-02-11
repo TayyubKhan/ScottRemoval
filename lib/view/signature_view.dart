@@ -31,9 +31,38 @@ class _Signature_ViewState extends State<Signature_View>
   void initState() {
     // TODO: implement initState
     super.initState();
+
     show = false;
   }
 
+  // Future signatureimage() async{
+  //   dynamic imageResponse =
+  //       await http.get(Uri.parse(
+  //       'https://scotremovals.com/api/assets/order_signatures/${snapshot.data!.data![index].signature}'));
+  //   if (imageResponse.bodyBytes !=
+  //       null) {
+  //     data.setSignatureBytes(
+  //         imageResponse.bodyBytes,
+  //         index);
+  //   }
+  //   dynamic response = await order
+  //       .orderDetailApi(context);
+  //   data.getdata(
+  //       response[
+  //       'waiver_form'][response[
+  //       'waiver_form']
+  //           .length -
+  //           1]['waiver_description']
+  //           .toString(),
+  //       index);
+  //   data.getdata2(
+  //       response['comments'][
+  //       response['comments']
+  //           .length -
+  //           1]['messege']
+  //           .toString(),
+  //       index);
+  // }
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -43,7 +72,7 @@ class _Signature_ViewState extends State<Signature_View>
     var width = MediaQuery.of(context).size.width * 1;
     return WillPopScope(
       onWillPop: () async {
-        Navigator.pushNamed(context, RoutesName.singleOrder);
+        Navigator.pushReplacementNamed(context, RoutesName.singleOrder);
         return false;
       },
       child: Scaffold(
@@ -51,7 +80,7 @@ class _Signature_ViewState extends State<Signature_View>
           backgroundColor: BC.blue,
           leading: IconButton(
               onPressed: () {
-                Navigator.pushNamed(context, RoutesName.singleOrder);
+                Navigator.pushReplacementNamed(context, RoutesName.singleOrder);
               },
               icon: const Icon(
                 Icons.arrow_back_ios,
@@ -67,97 +96,98 @@ class _Signature_ViewState extends State<Signature_View>
           ),
           centerTitle: true,
         ),
-        body: PageStorage(
-          bucket: PageStorageBucket(),
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 20,
-                ),
-                const Text(
-                  'Please sign below to acknowledge receipt of item/s specified on your Booking Conformation.',
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                InkWell(
-                  onTap: () {
-                    draw = false;
-                    show = true;
-                    setState(() {});
-                    _signaturePadKey.currentState!.clear();
-                  },
-                  child: const Text(
-                    'Clear Signature',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
-                        color: BC.blue),
+        body: SingleChildScrollView(
+          child: PageStorage(
+            bucket: PageStorageBucket(),
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(
+                    height: 20,
                   ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  height: height * 0.6,
-                  width: width,
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.grey,
+                  const Text(
+                    'Please sign below to acknowledge receipt of item/s specified on your Booking Conformation.',
+                    style: TextStyle(fontFamily: "HelveticaBold", fontSize: 15),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  InkWell(
+                    onTap: () {
+                      draw = false;
+                      show = true;
+                      setState(() {});
+                      _signaturePadKey.currentState!.clear();
+                    },
+                    child: const Text(
+                      'Clear Signature',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                          color: BC.blue),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    height: height * 0.6,
+                    width: width,
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.grey,
+                                ),
                               ),
-                            ),
-                            child: show == true
-                                ? SfSignaturePad(
-                                    onDrawStart: () {
-                                      draw = true;
-                                      return false;
-                                    },
-                                    key: _signaturePadKey,
-                                  )
-                                : InkWell(
-                                    onTap: () {
-                                      show = true;
-                                      setState(() {});
-                                    },
-                                    child: Image.memory(
-                                        data.signature[data.index]!))),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                    ],
+                              child: show == true
+                                  ? SfSignaturePad(
+                                      onDrawStart: () {
+                                        draw = true;
+                                        return false;
+                                      },
+                                      key: _signaturePadKey,
+                                    )
+                                  : InkWell(
+                                      onTap: () {
+                                        show = true;
+                                        setState(() {});
+                                      },
+                                      child: Image.memory(
+                                          data.signature[data.index]!))),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const Spacer(),
-                Center(
-                  child: Consumer<AuthViewModelProvider>(
-                    builder: (context, value, child) {
-                      return Rounded_Button2(
-                        width: width * 0.9,
-                        loading: value.loading,
-                        height: height * 1,
-                        title: "DONE",
-                        onPress: () async {
-                          SharedPreferences sp =
-                              await SharedPreferences.getInstance();
-                          final signatureData =
-                              await _signaturePadKey.currentState?.toImage();
-                          final bytes = await signatureData?.toByteData(
-                              format: ImageByteFormat.png);
-                          Uint8List pngBytes;
-                          pngBytes = bytes!.buffer.asUint8List();
-                          Provider.of<DataViewViewModel>(context, listen: false)
-                              .setSignatureBytes(pngBytes, data.index);
-                          if (draw == true) {
+                  Center(
+                    child: Consumer<AuthViewModelProvider>(
+                      builder: (context, value, child) {
+                        return Rounded_Button2(
+                          width: width * 0.9,
+                          loading: value.loading,
+                          height: height * 1,
+                          title: "DONE",
+                          onPress: () async {
+                            SharedPreferences sp =
+                                await SharedPreferences.getInstance();
+                            final signatureData =
+                                await _signaturePadKey.currentState?.toImage();
+                            final bytes = await signatureData?.toByteData(
+                                format: ImageByteFormat.png);
+                            Uint8List pngBytes;
+                            pngBytes = bytes!.buffer.asUint8List();
+                            Provider.of<DataViewViewModel>(context,
+                                    listen: false)
+                                .setSignatureBytes(pngBytes, data.index);
+
                             value.setLoading(true);
                             dynamic valid = await signatureRepo
                                 .signatureAPI(context,
@@ -168,20 +198,17 @@ class _Signature_ViewState extends State<Signature_View>
                                             context, 'Time Out'));
                             value.setLoading(false);
                             if (valid == true) {
-                              Navigator.pushNamed(
+                              Navigator.pushReplacementNamed(
                                   context, RoutesName.singleOrder);
                             }
-                          } else {
-                            Utilis.error_flushbar_message(
-                                context, 'Please Sign');
-                          }
-                        },
-                      );
-                    },
+                          },
+                        );
+                      },
+                    ),
                   ),
-                ),
-                const SizedBox(height: 40),
-              ],
+                  const SizedBox(height: 40),
+                ],
+              ),
             ),
           ),
         ),

@@ -9,9 +9,10 @@ class AuthRepository {
     try {
       dynamic response =
           await _apiservices.getPostAPI_services(AppUrl.loginApiEndPoint, data);
+      print(response);
       return response;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 }

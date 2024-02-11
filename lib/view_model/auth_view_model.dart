@@ -42,7 +42,7 @@ class AuthViewModelProvider with ChangeNotifier {
         userPreference.saveUser(
             UserLogin_Model(loginToken: value['login_token'].toString()));
         Utilis.error_flushbar_message(context, "Login Successfully");
-        Navigator.pushNamed(context, RoutesName.home);
+        Navigator.pushReplacementNamed(context, RoutesName.home);
       } else {
         Utilis.error_flushbar_message(context, value['msg'].toString());
       }

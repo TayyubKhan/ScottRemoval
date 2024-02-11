@@ -8,14 +8,13 @@ import '../res/colors.dart';
 
 class ItemsAndFloorView extends StatelessWidget {
   const ItemsAndFloorView({super.key});
-
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height * 1;
     var width = MediaQuery.of(context).size.width * 1;
     return WillPopScope(
       onWillPop: () async {
-        Navigator.pushNamed(context, RoutesName.singleOrder);
+        Navigator.pushReplacementNamed(context, RoutesName.singleOrder);
         return false;
       },
       child: Scaffold(
@@ -24,7 +23,7 @@ class ItemsAndFloorView extends StatelessWidget {
           backgroundColor: BC.blue,
           leading: IconButton(
               onPressed: () {
-                Navigator.pushNamed(context, RoutesName.singleOrder);
+                Navigator.pushReplacementNamed(context, RoutesName.singleOrder);
               },
               icon: const Icon(
                 Icons.arrow_back_ios,
@@ -45,7 +44,7 @@ class ItemsAndFloorView extends StatelessWidget {
             children: [
               InkWell(
                 onTap: () {
-                  Navigator.pushNamed(context, RoutesName.addItems);
+                  Navigator.pushReplacementNamed(context, RoutesName.addItems);
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -77,7 +76,7 @@ class ItemsAndFloorView extends StatelessWidget {
               ),
               InkWell(
                 onTap: () {
-                  Navigator.pushNamed(context, RoutesName.addFloors);
+                  Navigator.pushReplacementNamed(context, RoutesName.addFloors);
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -105,7 +104,7 @@ class ItemsAndFloorView extends StatelessWidget {
               ),
               InkWell(
                 onTap: () {
-                  Navigator.pushNamed(context, RoutesName.extraitem);
+                  Navigator.pushReplacementNamed(context, RoutesName.extraitem);
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -118,7 +117,7 @@ class ItemsAndFloorView extends StatelessWidget {
                     ),
                     InkWell(
                       onTap: () {
-                        Navigator.pushNamed(context, RoutesName.extraitem);
+                        Navigator.pushReplacementNamed(context, RoutesName.extraitem);
                       },
                       child: const CircleAvatar(
                         backgroundColor: BC.login,
@@ -161,7 +160,7 @@ class ItemsAndFloorView extends StatelessWidget {
                   height: height * 1,
                   title: "DONE",
                   onPress: () {
-                    Navigator.pushNamed(context, RoutesName.singleOrder);
+                    Navigator.pushReplacementNamed(context, RoutesName.singleOrder);
                   }),
               const SizedBox(height: 20),
             ],

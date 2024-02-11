@@ -186,7 +186,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                   };
                                   gettingData();
                                   fk.fetchCookieAndLoginToken();
-                                  // ignore: use_build_context_synchronously
                                   authviewmodelprovider.loginApi(context, data);
                                   dataa.setData2([
                                     sp.getString('email').toString(),

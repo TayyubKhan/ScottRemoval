@@ -44,7 +44,7 @@ class _Waiver_Form_ViewState extends State<Waiver_Form_View> {
     var width = MediaQuery.of(context).size.width * 1;
     return WillPopScope(
       onWillPop: () async {
-        Navigator.pushNamed(context, RoutesName.singleOrder);
+        Navigator.pushReplacementNamed(context, RoutesName.singleOrder);
         return false;
       },
       child: Scaffold(
@@ -53,7 +53,7 @@ class _Waiver_Form_ViewState extends State<Waiver_Form_View> {
           backgroundColor: BC.blue,
           leading: IconButton(
               onPressed: () {
-                Navigator.pushNamed(context, RoutesName.singleOrder);
+                Navigator.pushReplacementNamed(context, RoutesName.singleOrder);
               },
               icon: const Icon(
                 Icons.arrow_back_ios,
@@ -151,7 +151,7 @@ class _Waiver_Form_ViewState extends State<Waiver_Form_View> {
                                                       context, 'Time Out'));
                                       value.setLoading(false);
                                       if (abc == true) {
-                                        Navigator.pushNamed(
+                                        Navigator.pushReplacementNamed(
                                             context, RoutesName.singleOrder);
                                       }
                                     } else {

@@ -3,6 +3,10 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 
 class DataViewViewModel with ChangeNotifier {
+  List<Map<String, String>> _location = [];
+  List<Map<String, String>> get location => _location;
+  List<List<Map<String, dynamic>>> _ids = [];
+  List<List<Map<String, dynamic>>> get ids => _ids;
   List<String> _urls = [];
   List<String> get urls => _urls;
   List<String> _wavdata = [];
@@ -39,7 +43,17 @@ class DataViewViewModel with ChangeNotifier {
     }
   }
 
+  void getId(List<Map<String, dynamic>> id, int index) {
+    if (_ids.contains(id)) {
+    } else {
+      _ids[index] = id;
+      notifyListeners();
+    }
+  }
+
   void createwavdata(int id) {
+    _location = List<Map<String, String>>.generate(id, (index) => {});
+    _ids = List<List<Map<String, dynamic>>>.generate(id, (index) => []);
     _imageFiles = List<List<File>>.generate(id, (index) => []);
     _wavdata = List<String>.generate(id, (index) => '');
     _cmt = List<String>.generate(id, (index) => '');
@@ -54,6 +68,11 @@ class DataViewViewModel with ChangeNotifier {
 
   void getdata(String data, int index) {
     _wavdata[index] = data;
+    notifyListeners();
+  }
+
+  void getLocation(Map<String, String> data, int index) {
+    _location[index] = data;
     notifyListeners();
   }
 

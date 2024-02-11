@@ -1,10 +1,10 @@
 // ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:scotremovals/res/Components/Rounded_Button.dart';
 import 'package:scotremovals/res/app_url.dart';
 import 'package:scotremovals/view_model/AdditemsViewVIewModel.dart';
+import 'package:scotremovals/view_model/ExtraItemFloorViewModel.dart';
 import 'package:scotremovals/view_model/dataViewModel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -13,10 +13,11 @@ import '../repository/updateItemRepo.dart';
 import '../res/colors.dart';
 import '../utils/Routes/routes_name.dart';
 import '../utils/utilis.dart';
-import '../view_model/ExtraItemFloorViewModel.dart';
 import '../view_model/auth_view_model.dart';
 
 class Extra_Items_View extends StatefulWidget {
+  const Extra_Items_View({super.key});
+
   @override
   State<Extra_Items_View> createState() => _Extra_Items_ViewState();
   dispose() {}
@@ -29,7 +30,7 @@ List<int> save = [];
 class _Extra_Items_ViewState extends State<Extra_Items_View> {
   final FocusNode _focusNode = FocusNode();
   String selectedOption = '';
-  bool add = false;
+  bool add = true;
   final String _selectedItem = 'Dismantling Service';
   final String _rselectedItem = 'Reassembly Service';
   final String _pselectedItem = 'Packing Service';
@@ -41,11 +42,27 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
     '4rth Floor',
     '5th Floor',
   ];
+  List<Map<String, dynamic>> dataList = [
+    {
+      'name': 'Bed',
+      'quantity': '1',
+      'id': '1',
+      'tab': 'Living',
+      'type': 'house_removal',
+      'parent': 498,
+      'parent_name': ''
+    }
+  ];
+  List<dynamic> ditem = [];
+  List<dynamic> ritem = [];
+  List<dynamic> pitem = [];
+
   List<String> filteredOptions = [];
   int id = 0;
   ExtraItemRepo extraItemApi = ExtraItemRepo();
   @override
   bool get wantKeepAlive => true;
+  bool loading=true;
   Widget build(BuildContext context) {
     UpdateItemRepo up = UpdateItemRepo();
     final item = Provider.of<ItemViewViewModel>(context, listen: true);
@@ -56,7 +73,7 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
 
     return WillPopScope(
       onWillPop: () async {
-        Navigator.pushNamed(context, RoutesName.singleOrder);
+        Navigator.pushReplacementNamed(context, RoutesName.singleOrder);
         return false;
       },
       child: Scaffold(
@@ -65,8 +82,9 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
             backgroundColor: BC.blue,
             leading: IconButton(
                 onPressed: () {
-                  it.clear();
-                  Navigator.pushNamed(context, RoutesName.singleOrder);
+                  // it.clear();
+                  Navigator.pushReplacementNamed(
+                      context, RoutesName.singleOrder);
                 },
                 icon: const Icon(
                   Icons.arrow_back_ios,
@@ -76,7 +94,7 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
               'Add Extra Services',
               style: TextStyle(
                   color: BC.white,
-                  fontSize: width * 0.067,
+                  fontSize: width * 0.06,
                   fontFamily: "HelveticaBold"),
             ),
             centerTitle: true,
@@ -102,262 +120,286 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(color: BC.lightGrey),
                             ),
-                            child: Consumer<ExtraItemViewViewModel>(
-                                builder: (context, ItemModel, child) {
-                              return FutureBuilder(
-                                future: extraItemApi
-                                    .getExtraItemRepo(AppUrl.dismantle),
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<dynamic> snapshot) {
-                                  if (snapshot.hasData) {
-                                    for (int i = 0;
-                                        i < snapshot.data['data'].length;
-                                        i++) {
-                                      ItemModel.getid(int.parse(
-                                          snapshot.data['data'][i]['id']));
-                                      ItemModel.getItem(snapshot.data['data'][i]
-                                              ['name']
-                                          .toString());
-                                    }
-                                    return DropdownButton(
-                                      focusNode: _focusNode,
-                                      borderRadius: BorderRadius.circular(10),
-                                      isExpanded: true,
-                                      hint: const Text('Dismantling Service'),
-                                      underline: const SizedBox(),
-                                      icon: const Icon(
-                                        Icons.search,
-                                      ),
-                                      value: ItemModel.dselectedItem ??
-                                          _selectedItem,
-                                      onChanged: (value) {
-                                        if (value != 'Dismantling Service') {
-                                          ItemModel.ddropDownIList
-                                              .contains(value);
-                                          ItemModel.dsaveitem(value.toString());
-                                          for (int i = 0;
-                                              i < ItemModel.dsavedItem.length;
-                                              i++) {
-                                            for (int j = 0;
-                                                j <
-                                                    ItemModel
-                                                        .ddropDownIList.length;
-                                                j++) {
-                                              if (ItemModel.ddropDownIList[j]
-                                                  .contains(ItemModel
-                                                      .dsavedItem[i])) {
-                                                ItemModel.getsavedid(j);
-                                              }
-                                            }
-                                          }
-                                        }
-                                        _focusNode.unfocus();
-                                      },
-                                      items:
-                                          ItemModel.ddropDownIList.map((item) {
-                                        return DropdownMenuItem(
-                                          value: item,
-                                          child: Text(item),
-                                        );
-                                      }).toList(),
-                                    );
-                                  }
-                                  return DropdownButton(
-                                    borderRadius: BorderRadius.circular(10),
-                                    isExpanded: true,
-                                    hint: const Text('Dismantling Service'),
-                                    underline: const SizedBox(),
-                                    icon: const Icon(
-                                      Icons.keyboard_arrow_down,
-                                    ),
-                                    items: const [],
-                                    onChanged: (value) {},
-                                  );
-                                },
-                              );
-                            }),
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          it.dsavedItem.isNotEmpty
-                              ? Consumer<ExtraItemViewViewModel>(
-                                  builder: (BuildContext context, value,
-                                      Widget? child) {
-                                    return Text(
-                                      'Additional Items (${value.dsavedItem.length})',
-                                      style: TextStyle(
-                                        fontSize: width * 0.048,
-                                      ),
-                                    );
-                                  },
-                                )
-                              : const SizedBox(),
-                          Consumer<ExtraItemViewViewModel>(
-                              builder: (context, value, child) {
-                            return FutureBuilder(
+                            child: FutureBuilder(
                               future: extraItemApi
                                   .getExtraItemRepo(AppUrl.dismantle),
                               builder: (BuildContext context,
                                   AsyncSnapshot<dynamic> snapshot) {
+                                ditem = [];
                                 if (snapshot.hasData) {
-                                  return it.dsavedItem.isNotEmpty
-                                      ? SizedBox(
-                                          height: height *
-                                              value.dsavedItem.length *
-                                              0.1,
-                                          child: ListView.builder(
-                                            physics:
-                                                const NeverScrollableScrollPhysics(),
-                                            itemCount: value.dsavedItem.length,
-                                            itemBuilder: (context, index) {
-                                              return Column(
-                                                children: [
-                                                  const SizedBox(
-                                                    height: 20,
-                                                  ),
-                                                  Container(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 20,
-                                                        vertical: 5),
-                                                    decoration: BoxDecoration(
-                                                        color: const Color(
-                                                            0xffEBEBEB),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(20)),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        SizedBox(
-                                                          width: width * 0.46,
-                                                          child: Text(
-                                                            value.dsavedItem[
-                                                                index],
-                                                            style: TextStyle(
-                                                                fontSize:
-                                                                    width *
-                                                                        0.048,
-                                                                fontFamily:
-                                                                    "HelveticaRegular",
-                                                                color: Colors
-                                                                    .black),
-                                                          ),
+                                  loading=false;
+                                  return Consumer<ExtraItemViewViewModel>(
+                                      builder: (context, ItemModel, child) {
+                                        ditem = snapshot.data['data'];
+                                        for (int i = 0;
+                                        i < snapshot.data['data'].length;
+                                        i++) {
+                                          ItemModel.getid(
+                                              int.parse(
+                                                  snapshot.data['data'][i]['id']),
+                                              data.index);
+                                          ItemModel.getItem(snapshot.data['data'][i]
+                                          ['name']
+                                              .toString());
+                                        }
+                                        return DropdownButton(
+                                          focusNode: _focusNode,
+                                          borderRadius: BorderRadius.circular(10),
+                                          isExpanded: true,
+                                          hint: const Text('Dismantling Service'),
+                                          underline: const SizedBox(),
+                                          icon: const Icon(
+                                            Icons.search,
+                                          ),
+                                          value: ItemModel.dselectedItem ??
+                                              _selectedItem,
+                                          onChanged: (value) {
+                                            if (value != 'Dismantling Service') {
+                                              ItemModel.ddropDownIList
+                                                  .contains(value);
+                                              ItemModel.dsaveitem(
+                                                  value.toString(), data.index);
+                                              for (int i = 0;
+                                              i <
+                                                  ItemModel
+                                                      .dsavedItem[data.index]
+                                                      .length;
+                                              i++) {
+                                                for (int j = 0;
+                                                j <
+                                                    ItemModel
+                                                        .ddropDownIList.length;
+                                                j++) {
+                                                  if (ItemModel.ddropDownIList[j]
+                                                      .contains(
+                                                      ItemModel.dsavedItem[
+                                                      data.index][i])) {
+                                                    ItemModel.getsavedid(
+                                                        j, data.index);
+                                                  }
+                                                }
+                                              }
+                                            }
+                                            _focusNode.unfocus();
+                                          },
+                                          items:
+                                          ItemModel.ddropDownIList.map((item) {
+                                            return DropdownMenuItem(
+                                              value: item,
+                                              child: Text(item),
+                                            );
+                                          }).toList(),
+                                        );
+                                      });
+                                }
+                                return DropdownButton(
+                                  borderRadius: BorderRadius.circular(10),
+                                  isExpanded: true,
+                                  hint: const Text('Dismantling Service'),
+                                  underline: const SizedBox(),
+                                  icon: const Icon(
+                                    Icons.keyboard_arrow_down,
+                                  ),
+                                  items: const [],
+                                  onChanged: (value) {},
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Visibility(
+                            visible: it.dsavedItem[data.index].isNotEmpty,
+                            child: Consumer<ExtraItemViewViewModel>(
+                              builder:
+                                  (BuildContext context, value, Widget? child) {
+                                return Text(
+                                  'Additional Items (${value.dsavedItem[data.index].length})',
+                                  style: TextStyle(
+                                    fontSize: width * 0.048,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          FutureBuilder(
+                            future:
+                            extraItemApi.getExtraItemRepo(AppUrl.dismantle),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<dynamic> snapshot) {
+                              if (snapshot.hasData) {
+                                return it.dsavedItem[data.index].isNotEmpty
+                                    ? Consumer<ExtraItemViewViewModel>(
+                                    builder: (context, value, child) {
+                                      return SizedBox(
+                                        height: height *
+                                            value.dsavedItem[data.index]
+                                                .length *
+                                            0.12,
+                                        child: ListView.builder(
+                                          physics:
+                                          const NeverScrollableScrollPhysics(),
+                                          itemCount: value
+                                              .dsavedItem[data.index].length,
+                                          itemBuilder: (context, index) {
+                                            return Column(
+                                              children: [
+                                                const SizedBox(
+                                                  height: 10,
+                                                ),
+                                                Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 5),
+                                                  decoration: BoxDecoration(
+                                                      color: Colors.grey
+                                                          .withOpacity(0.3),
+                                                      borderRadius:
+                                                      BorderRadius
+                                                          .circular(20)),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                    children: [
+                                                      SizedBox(
+                                                        width: width * 0.46,
+                                                        child: Text(
+                                                          value.dsavedItem[
+                                                          data.index]
+                                                          [index],
+                                                          style: TextStyle(
+                                                              fontSize:
+                                                              width *
+                                                                  0.048,
+                                                              fontFamily:
+                                                              "HelveticaRegular",
+                                                              color: Colors
+                                                                  .black),
                                                         ),
-                                                        Row(
-                                                          children: [
-                                                            Container(
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          Container(
+                                                            decoration:
+                                                            BoxDecoration(
+                                                              color: BC.blue,
+                                                              borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                  30),
+                                                            ),
+                                                            child: InkWell(
+                                                              onTap: () {
+                                                                if (value
+                                                                    .Dcounters[
+                                                                data.index]
+                                                                [
+                                                                index]
+                                                                    .value >=
+                                                                    2) {
+                                                                  value.decrementDCounter(
+                                                                      index,
+                                                                      data.index);
+                                                                }
+                                                              },
+                                                              child:
+                                                              const Icon(
+                                                                Icons.remove,
+                                                                size: 20,
+                                                                color:
+                                                                BC.white,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 10,
+                                                          ),
+                                                          Text(
+                                                            value
+                                                                .Dcounters[
+                                                            data.index]
+                                                            [index]
+                                                                .value
+                                                                .toString(),
+                                                            style: TextStyle(
+                                                                fontFamily:
+                                                                "HelveticaRegular",
+                                                                fontSize:
+                                                                width *
+                                                                    0.045),
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 10,
+                                                          ),
+                                                          Container(
                                                               decoration:
-                                                                  BoxDecoration(
-                                                                color: BC.blue,
+                                                              BoxDecoration(
+                                                                color:
+                                                                BC.blue,
                                                                 borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            30),
+                                                                BorderRadius
+                                                                    .circular(
+                                                                    30),
                                                               ),
                                                               child: InkWell(
                                                                 onTap: () {
-                                                                  if (value
-                                                                          .Dcounters[
-                                                                              index]
-                                                                          .value >=
-                                                                      2) {
-                                                                    value.decerementDCounter(
-                                                                        index);
-                                                                  }
+                                                                  value.incrementDCounter(
+                                                                      index,
+                                                                      data.index);
                                                                 },
                                                                 child:
-                                                                    const Icon(
-                                                                  Icons.remove,
+                                                                const Icon(
+                                                                  Icons.add,
                                                                   size: 20,
-                                                                  color:
-                                                                      BC.white,
+                                                                  color: BC
+                                                                      .white,
                                                                 ),
-                                                              ),
-                                                            ),
-                                                            const SizedBox(
-                                                              width: 10,
-                                                            ),
-                                                            Text(
-                                                              value
-                                                                  .Dcounters[
-                                                                      index]
-                                                                  .value
-                                                                  .toString(),
-                                                              style: TextStyle(
-                                                                  fontFamily:
-                                                                      "HelveticaRegular",
-                                                                  fontSize:
-                                                                      width *
-                                                                          0.045),
-                                                            ),
-                                                            const SizedBox(
-                                                              width: 10,
-                                                            ),
-                                                            Container(
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color:
-                                                                      BC.blue,
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              30),
-                                                                ),
-                                                                child: InkWell(
-                                                                  onTap: () {
-                                                                    value.incrementDCounter(
-                                                                        index);
-                                                                  },
-                                                                  child:
-                                                                      const Icon(
-                                                                    Icons.add,
-                                                                    size: 20,
-                                                                    color: BC
-                                                                        .white,
-                                                                  ),
-                                                                ))
-                                                          ],
-                                                        ),
-                                                        IconButton(
-                                                            onPressed: () {
-                                                              dynamic data = value
-                                                                  .dsavedItem;
+                                                              ))
+                                                        ],
+                                                      ),
+                                                      IconButton(
+                                                          onPressed: () {
+                                                            dynamic dataa =
+                                                            value.dsavedItem[
+                                                            data.index];
+                                                          },
+                                                          icon: InkWell(
+                                                            onTap: () {
+                                                              value.dremoveitem(
+                                                                  index,
+                                                                  data.index);
                                                             },
-                                                            icon: InkWell(
-                                                              onTap: () {
-                                                                value
-                                                                    .dremoveitem(
-                                                                        index);
-                                                              },
-                                                              child: const Icon(
-                                                                Icons.delete,
-                                                                color: Color(
-                                                                    0xffE10000),
-                                                              ),
-                                                            ))
-                                                      ],
-                                                    ),
+                                                            child: const Icon(
+                                                              Icons.delete,
+                                                              color: Color(
+                                                                  0xffE10000),
+                                                            ),
+                                                          ))
+                                                    ],
                                                   ),
-                                                  SizedBox(
-                                                    height: height * 0.01,
-                                                  )
-                                                ],
-                                              );
-                                            },
-                                          ),
-                                        )
-                                      : const SizedBox(
-                                          height: 0.1,
-                                        );
-                                }
-                                return const CircularProgressIndicator();
-                              },
-                            );
-                          }),
+                                                ),
+                                                SizedBox(
+                                                  height: height * 0.01,
+                                                )
+                                              ],
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    })
+                                    : const SizedBox(
+                                  height: 0.1,
+                                );
+                              }
+                              return const Center(
+                                  child: CircularProgressIndicator(
+                                    color: BC.blue,
+                                  ));
+                            },
+                          ),
                         ],
                       ),
                       Column(
@@ -370,262 +412,283 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(color: BC.lightGrey),
                             ),
-                            child: Consumer<ExtraItemViewViewModel>(
-                                builder: (context, ItemModel, child) {
-                              return FutureBuilder(
-                                future: extraItemApi
-                                    .getExtraItemRepo(AppUrl.assembly),
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<dynamic> snapshot) {
-                                  if (snapshot.hasData) {
-                                    for (int i = 0;
-                                        i < snapshot.data['data'].length;
-                                        i++) {
-                                      ItemModel.getrid(int.parse(
-                                          snapshot.data['data'][i]['id']));
-                                      ItemModel.getrItem(snapshot.data['data']
-                                              [i]['name']
-                                          .toString());
-                                    }
-
-                                    return DropdownButton(
-                                      focusNode: _focusNode,
-                                      borderRadius: BorderRadius.circular(10),
-                                      isExpanded: true,
-                                      hint: const Text('Search Items'),
-                                      underline: const SizedBox(),
-                                      icon: const Icon(
-                                        Icons.search,
-                                      ),
-                                      value: ItemModel.rselectedItem ??
-                                          _rselectedItem,
-                                      onChanged: (value) {
-                                        if (value != 'Reassembly Service') {
-                                          ItemModel.rdropDownIList
-                                              .contains(value);
-                                          ItemModel.saveitem(value.toString());
-                                          for (int i = 0;
-                                              i < ItemModel.rsavedItem.length;
-                                              i++) {
-                                            for (int j = 0;
-                                                j <
-                                                    ItemModel
-                                                        .rdropDownIList.length;
-                                                j++) {
-                                              if (ItemModel.rdropDownIList[j]
-                                                  .contains(ItemModel
-                                                      .rsavedItem[i])) {
-                                                ItemModel.getrsavedid(j);
-                                              }
-                                            }
-                                          }
-                                        }
-                                        _focusNode.unfocus();
-                                      },
-                                      items:
-                                          ItemModel.rdropDownIList.map((item) {
-                                        return DropdownMenuItem(
-                                          value: item,
-                                          child: Text(item),
-                                        );
-                                      }).toList(),
-                                    );
-                                  }
-                                  return DropdownButton(
-                                    borderRadius: BorderRadius.circular(10),
-                                    isExpanded: true,
-                                    hint: const Text('Reassembly Service'),
-                                    underline: const SizedBox(),
-                                    icon: const Icon(
-                                      Icons.keyboard_arrow_down,
-                                    ),
-                                    items: const [],
-                                    onChanged: (value) {},
-                                  );
-                                },
-                              );
-                            }),
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          it.rsavedItem.isNotEmpty
-                              ? Consumer<ExtraItemViewViewModel>(
-                                  builder: (BuildContext context, value,
-                                      Widget? child) {
-                                    return Text(
-                                      'Additional Items (${value.rsavedItem.length})',
-                                      style: TextStyle(
-                                        fontSize: width * 0.048,
-                                      ),
-                                    );
-                                  },
-                                )
-                              : const SizedBox(),
-                          Consumer<ExtraItemViewViewModel>(
-                              builder: (context, value, child) {
-                            print(value.rsavedid);
-                            return FutureBuilder(
+                            child: FutureBuilder(
                               future: extraItemApi
                                   .getExtraItemRepo(AppUrl.assembly),
                               builder: (BuildContext context,
                                   AsyncSnapshot<dynamic> snapshot) {
+                                ritem = [];
                                 if (snapshot.hasData) {
-                                  return it.rsavedItem.isNotEmpty
-                                      ? SizedBox(
-                                          height: height *
-                                              value.rsavedItem.length *
-                                              0.1,
-                                          child: ListView.builder(
-                                            physics:
-                                                const NeverScrollableScrollPhysics(),
-                                            itemCount: value.rsavedItem.length,
-                                            itemBuilder: (context, index) {
-                                              return Column(
-                                                children: [
-                                                  const SizedBox(
-                                                    height: 20,
-                                                  ),
-                                                  Container(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 20,
-                                                        vertical: 5),
-                                                    decoration: BoxDecoration(
-                                                        color: const Color(
-                                                            0xffEBEBEB),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(20)),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        SizedBox(
-                                                          width: width * 0.46,
-                                                          child: Text(
-                                                            value.rsavedItem[
-                                                                index],
-                                                            style: TextStyle(
-                                                                fontSize:
-                                                                    width *
-                                                                        0.048,
-                                                                fontFamily:
-                                                                    "HelveticaRegular",
-                                                                color: Colors
-                                                                    .black),
-                                                          ),
+                                  return Consumer<ExtraItemViewViewModel>(
+                                      builder: (context, ItemModel, child) {
+                                        ritem = snapshot.data['data'];
+                                        for (int i = 0;
+                                        i < snapshot.data['data'].length;
+                                        i++) {
+                                          ItemModel.getrid(
+                                              int.parse(
+                                                  snapshot.data['data'][i]['id']),
+                                              data.index);
+                                          ItemModel.getrItem(snapshot.data['data']
+                                          [i]['name']
+                                              .toString());
+                                        }
+                                        return DropdownButton(
+                                          focusNode: _focusNode,
+                                          borderRadius: BorderRadius.circular(10),
+                                          isExpanded: true,
+                                          hint: const Text('Search Items'),
+                                          underline: const SizedBox(),
+                                          icon: const Icon(
+                                            Icons.search,
+                                          ),
+                                          value: ItemModel.rselectedItem ??
+                                              _rselectedItem,
+                                          onChanged: (value) {
+                                            if (value != 'Reassembly Service') {
+                                              ItemModel.rdropDownIList
+                                                  .contains(value);
+                                              ItemModel.saveitem(
+                                                  value.toString(), data.index);
+                                              for (int i = 0;
+                                              i <
+                                                  ItemModel
+                                                      .rsavedItem[data.index]
+                                                      .length;
+                                              i++) {
+                                                for (int j = 0;
+                                                j <
+                                                    ItemModel
+                                                        .rdropDownIList.length;
+                                                j++) {
+                                                  if (ItemModel.rdropDownIList[j]
+                                                      .contains(
+                                                      ItemModel.rsavedItem[
+                                                      data.index][i])) {
+                                                    ItemModel.getrsavedid(
+                                                        j, data.index);
+                                                  }
+                                                }
+                                              }
+                                            }
+                                            _focusNode.unfocus();
+                                          },
+                                          items:
+                                          ItemModel.rdropDownIList.map((item) {
+                                            return DropdownMenuItem(
+                                              value: item,
+                                              child: Text(item),
+                                            );
+                                          }).toList(),
+                                        );
+                                      });
+                                }
+                                return DropdownButton(
+                                  borderRadius: BorderRadius.circular(10),
+                                  isExpanded: true,
+                                  hint: const Text('Reassembly Service'),
+                                  underline: const SizedBox(),
+                                  icon: const Icon(
+                                    Icons.keyboard_arrow_down,
+                                  ),
+                                  items: const [],
+                                  onChanged: (value) {},
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Visibility(
+                            visible: it.rsavedItem[data.index].isNotEmpty,
+                            child: Consumer<ExtraItemViewViewModel>(
+                              builder:
+                                  (BuildContext context, value, Widget? child) {
+                                return Text(
+                                  'Additional Items (${value.rsavedItem[data.index].length})',
+                                  style: TextStyle(
+                                    fontSize: width * 0.048,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          FutureBuilder(
+                            future:
+                            extraItemApi.getExtraItemRepo(AppUrl.assembly),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<dynamic> snapshot) {
+                              if (snapshot.hasData) {
+                                return it.rsavedItem[data.index].isNotEmpty
+                                    ? Consumer<ExtraItemViewViewModel>(
+                                    builder: (context, value, child) {
+                                      return SizedBox(
+                                        height: height *
+                                            value.rsavedItem[data.index]
+                                                .length *
+                                            0.13,
+                                        child: ListView.builder(
+                                          physics:
+                                          const NeverScrollableScrollPhysics(),
+                                          itemCount: value
+                                              .rsavedItem[data.index].length,
+                                          itemBuilder: (context, index) {
+                                            return Column(
+                                              children: [
+                                                const SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 5),
+                                                  decoration: BoxDecoration(
+                                                      color: Colors.grey
+                                                          .withOpacity(0.3),
+                                                      borderRadius:
+                                                      BorderRadius
+                                                          .circular(20)),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                    children: [
+                                                      SizedBox(
+                                                        width: width * 0.46,
+                                                        child: Text(
+                                                          value.rsavedItem[
+                                                          data.index]
+                                                          [index],
+                                                          style: TextStyle(
+                                                              fontSize:
+                                                              width *
+                                                                  0.048,
+                                                              fontFamily:
+                                                              "HelveticaRegular",
+                                                              color: Colors
+                                                                  .black),
                                                         ),
-                                                        Row(
-                                                          children: [
-                                                            Container(
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          Container(
+                                                            decoration:
+                                                            BoxDecoration(
+                                                              color: BC.blue,
+                                                              borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                  30),
+                                                            ),
+                                                            child: InkWell(
+                                                              onTap: () {
+                                                                if (value
+                                                                    .counters[
+                                                                data.index]
+                                                                [
+                                                                index]
+                                                                    .value >=
+                                                                    2) {
+                                                                  value.decrementCounter(
+                                                                      index,
+                                                                      data.index);
+                                                                }
+                                                              },
+                                                              child:
+                                                              const Icon(
+                                                                Icons.remove,
+                                                                size: 20,
+                                                                color:
+                                                                BC.white,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 10,
+                                                          ),
+                                                          Text(
+                                                            value
+                                                                .counters[
+                                                            data.index]
+                                                            [index]
+                                                                .value
+                                                                .toString(),
+                                                            style: TextStyle(
+                                                                fontFamily:
+                                                                "HelveticaRegular",
+                                                                fontSize:
+                                                                width *
+                                                                    0.045),
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 10,
+                                                          ),
+                                                          Container(
                                                               decoration:
-                                                                  BoxDecoration(
-                                                                color: BC.blue,
+                                                              BoxDecoration(
+                                                                color:
+                                                                BC.blue,
                                                                 borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            30),
+                                                                BorderRadius
+                                                                    .circular(
+                                                                    30),
                                                               ),
                                                               child: InkWell(
                                                                 onTap: () {
-                                                                  if (value
-                                                                          .counters[
-                                                                              index]
-                                                                          .value >=
-                                                                      2) {
-                                                                    value.decerementCounter(
-                                                                        index);
-                                                                  }
+                                                                  value.incrementCounter(
+                                                                      index,
+                                                                      data.index);
                                                                 },
                                                                 child:
-                                                                    const Icon(
-                                                                  Icons.remove,
+                                                                const Icon(
+                                                                  Icons.add,
                                                                   size: 20,
-                                                                  color:
-                                                                      BC.white,
+                                                                  color: BC
+                                                                      .white,
                                                                 ),
-                                                              ),
-                                                            ),
-                                                            const SizedBox(
-                                                              width: 10,
-                                                            ),
-                                                            Text(
-                                                              value
-                                                                  .counters[
-                                                                      index]
-                                                                  .value
-                                                                  .toString(),
-                                                              style: TextStyle(
-                                                                  fontFamily:
-                                                                      "HelveticaRegular",
-                                                                  fontSize:
-                                                                      width *
-                                                                          0.045),
-                                                            ),
-                                                            const SizedBox(
-                                                              width: 10,
-                                                            ),
-                                                            Container(
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color:
-                                                                      BC.blue,
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              30),
-                                                                ),
-                                                                child: InkWell(
-                                                                  onTap: () {
-                                                                    value.incrementCounter(
-                                                                        index);
-                                                                  },
-                                                                  child:
-                                                                      const Icon(
-                                                                    Icons.add,
-                                                                    size: 20,
-                                                                    color: BC
-                                                                        .white,
-                                                                  ),
-                                                                ))
-                                                          ],
-                                                        ),
-                                                        IconButton(
-                                                            onPressed: () {
-                                                              dynamic data = value
-                                                                  .rsavedItem;
+                                                              ))
+                                                        ],
+                                                      ),
+                                                      IconButton(
+                                                          onPressed: () {
+                                                            dynamic dataa =
+                                                            value.rsavedItem[
+                                                            data.index];
+                                                          },
+                                                          icon: InkWell(
+                                                            onTap: () {
+                                                              value.removeitem(
+                                                                  index,
+                                                                  data.index);
                                                             },
-                                                            icon: InkWell(
-                                                              onTap: () {
-                                                                value
-                                                                    .removeitem(
-                                                                        index);
-                                                              },
-                                                              child: const Icon(
-                                                                Icons.delete,
-                                                                color: Color(
-                                                                    0xffE10000),
-                                                              ),
-                                                            ))
-                                                      ],
-                                                    ),
+                                                            child: const Icon(
+                                                              Icons.delete,
+                                                              color: Color(
+                                                                  0xffE10000),
+                                                            ),
+                                                          ))
+                                                    ],
                                                   ),
-                                                  SizedBox(
-                                                    height: height * 0.01,
-                                                  )
-                                                ],
-                                              );
-                                            },
-                                          ),
-                                        )
-                                      : const SizedBox();
-                                }
-                                return const CircularProgressIndicator();
-                              },
-                            );
-                          }),
+                                                ),
+                                                SizedBox(
+                                                  height: height * 0.01,
+                                                )
+                                              ],
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    })
+                                    : const SizedBox();
+                              }
+                              return const Center(
+                                  child: CircularProgressIndicator(
+                                    color: BC.blue,
+                                  ));
+                            },
+                          )
                         ],
                       ),
                       Column(
@@ -638,263 +701,287 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(color: BC.lightGrey),
                             ),
-                            child: Consumer<ExtraItemViewViewModel>(
-                                builder: (context, ItemModel, child) {
-                              return FutureBuilder(
-                                future: extraItemApi
-                                    .getExtraItemRepo(AppUrl.packing),
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<dynamic> snapshot) {
-                                  if (snapshot.hasData) {
-                                    print(ItemModel.pdropDownIList);
-                                    for (int i = 0;
+                            child: FutureBuilder(
+                              future:
+                              extraItemApi.getExtraItemRepo(AppUrl.packing),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<dynamic> snapshot) {
+                                pitem = [];
+                                if (snapshot.hasData) {
+                                  return Consumer<ExtraItemViewViewModel>(
+                                      builder: (context, ItemModel, child) {
+                                        pitem = snapshot.data['data'];
+                                        for (int i = 0;
                                         i < snapshot.data['data'].length;
                                         i++) {
-                                      ItemModel.getpid(int.parse(
-                                          snapshot.data['data'][i]['id']));
-                                      ItemModel.getpItem(snapshot.data['data']
-                                              [i]['name']
-                                          .toString());
-                                    }
-                                    return DropdownButton(
-                                      focusNode: _focusNode,
-                                      borderRadius: BorderRadius.circular(10),
-                                      isExpanded: true,
-                                      hint: const Text('Packing Service'),
-                                      underline: const SizedBox(),
-                                      icon: const Icon(
-                                        Icons.search,
-                                      ),
-                                      value: ItemModel.pselectedItem ??
-                                          'Packing Service',
-                                      onChanged: (value) {
-                                        if (value != 'Packing Service') {
-                                          ItemModel.pdropDownIList
-                                              .contains(value);
-                                          ItemModel.savepitem(value.toString());
-                                          for (int i = 0;
-                                              i < ItemModel.psavedItem.length;
+                                          ItemModel.getpid(
+                                              int.parse(
+                                                  snapshot.data['data'][i]['id']),
+                                              data.index);
+                                          ItemModel.getpItem(snapshot.data['data']
+                                          [i]['name']
+                                              .toString());
+                                        }
+                                        return DropdownButton(
+                                          focusNode: _focusNode,
+                                          borderRadius: BorderRadius.circular(10),
+                                          isExpanded: true,
+                                          hint: const Text('Packing Service'),
+                                          underline: const SizedBox(),
+                                          icon: const Icon(
+                                            Icons.search,
+                                          ),
+                                          value: ItemModel.pselectedItem ??
+                                              'Packing Service',
+                                          onChanged: (value) {
+                                            if (value != 'Packing Service') {
+                                              ItemModel.pdropDownIList
+                                                  .contains(value);
+                                              ItemModel.savepitem(
+                                                  value.toString(), data.index);
+                                              for (int i = 0;
+                                              i <
+                                                  ItemModel
+                                                      .psavedItem[data.index]
+                                                      .length;
                                               i++) {
-                                            for (int j = 0;
+                                                for (int j = 0;
                                                 j <
                                                     ItemModel
                                                         .pdropDownIList.length;
                                                 j++) {
-                                              if (ItemModel.pdropDownIList[j]
-                                                  .contains(ItemModel
-                                                      .psavedItem[i])) {
-                                                ItemModel.getpsavedid(j);
+                                                  if (ItemModel.pdropDownIList[j]
+                                                      .contains(
+                                                      ItemModel.psavedItem[
+                                                      data.index][i])) {
+                                                    ItemModel.getpsavedid(
+                                                        j, data.index);
+                                                  }
+                                                }
                                               }
                                             }
-                                          }
-                                        }
-                                        _focusNode.unfocus();
-                                      },
-                                      items:
+                                            _focusNode.unfocus();
+                                          },
+                                          items:
                                           ItemModel.pdropDownIList.map((item) {
-                                        return DropdownMenuItem(
-                                          value: item,
-                                          child: Text(item),
+                                            return DropdownMenuItem(
+                                              value: item,
+                                              child: Text(item),
+                                            );
+                                          }).toList(),
                                         );
-                                      }).toList(),
-                                    );
-                                  }
-                                  return DropdownButton(
-                                    borderRadius: BorderRadius.circular(10),
-                                    isExpanded: true,
-                                    hint: const Text('Packing Service'),
-                                    underline: const SizedBox(),
-                                    icon: const Icon(
-                                      Icons.keyboard_arrow_down,
-                                    ),
-                                    items: const [],
-                                    onChanged: (value) {},
-                                  );
-                                },
-                              );
-                            }),
+                                      });
+                                }
+                                return DropdownButton(
+                                  borderRadius: BorderRadius.circular(10),
+                                  isExpanded: true,
+                                  hint: const Text('Packing Service'),
+                                  underline: const SizedBox(),
+                                  icon: const Icon(
+                                    Icons.keyboard_arrow_down,
+                                  ),
+                                  items: const [],
+                                  onChanged: (value) {},
+                                );
+                              },
+                            ),
                           ),
                           const SizedBox(
                             height: 20,
                           ),
-                          it.psavedItem.isNotEmpty
+                          it.psavedItem[data.index].isNotEmpty
                               ? Consumer<ExtraItemViewViewModel>(
-                                  builder: (BuildContext context, value,
-                                      Widget? child) {
-                                    return Text(
-                                      'Additional Items (${value.psavedItem.length})',
-                                      style: TextStyle(
-                                        fontSize: width * 0.048,
-                                      ),
-                                    );
-                                  },
-                                )
+                            builder: (BuildContext context, value,
+                                Widget? child) {
+                              return Text(
+                                'Additional Items (${value.psavedItem[data.index].length})',
+                                style: TextStyle(
+                                  fontSize: width * 0.048,
+                                ),
+                              );
+                            },
+                          )
                               : const SizedBox(),
                           const SizedBox(
                             height: 20,
                           ),
-                          Consumer<ExtraItemViewViewModel>(
-                              builder: (context, value, child) {
-                            return FutureBuilder(
-                              future:
-                                  extraItemApi.getExtraItemRepo(AppUrl.packing),
-                              builder: (BuildContext context,
-                                  AsyncSnapshot<dynamic> snapshot) {
-                                if (snapshot.hasData) {
-                                  return it.psavedItem.isNotEmpty
-                                      ? SizedBox(
-                                          height: height *
-                                              value.psavedItem.length *
-                                              0.1,
-                                          child: ListView.builder(
-                                            physics:
-                                                const NeverScrollableScrollPhysics(),
-                                            itemCount: value.psavedItem.length,
-                                            itemBuilder: (context, index) {
-                                              return Column(
-                                                children: [
-                                                  Container(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 20,
-                                                        vertical: 5),
-                                                    decoration: BoxDecoration(
-                                                        color: const Color(
-                                                            0xffEBEBEB),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(20)),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        SizedBox(
-                                                          width: width * 0.46,
-                                                          child: Text(
-                                                            value.psavedItem[
-                                                                index],
-                                                            style: TextStyle(
-                                                                fontSize:
-                                                                    width *
-                                                                        0.048,
-                                                                fontFamily:
-                                                                    "HelveticaRegular",
-                                                                color: Colors
-                                                                    .black),
-                                                          ),
+                          FutureBuilder(
+                            future:
+                            extraItemApi.getExtraItemRepo(AppUrl.packing),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<dynamic> snapshot) {
+                              if (snapshot.hasData) {
+                                return it.psavedItem[data.index].isNotEmpty
+                                    ? Consumer<ExtraItemViewViewModel>(
+                                    builder: (context, value, child) {
+                                      return SizedBox(
+                                        height: height *
+                                            value.psavedItem[data.index]
+                                                .length *
+                                            0.13,
+                                        child: ListView.builder(
+                                          physics:
+                                          const NeverScrollableScrollPhysics(),
+                                          itemCount: value
+                                              .psavedItem[data.index].length,
+                                          itemBuilder: (context, index) {
+                                            return Column(
+                                              children: [
+                                                Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 5),
+                                                  decoration: BoxDecoration(
+                                                      color: Colors.grey
+                                                          .withOpacity(0.3),
+                                                      borderRadius:
+                                                      BorderRadius
+                                                          .circular(20)),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                    children: [
+                                                      SizedBox(
+                                                        width: width * 0.46,
+                                                        child: Text(
+                                                          value.psavedItem[
+                                                          data.index]
+                                                          [index],
+                                                          style: TextStyle(
+                                                              fontSize:
+                                                              width *
+                                                                  0.048,
+                                                              fontFamily:
+                                                              "HelveticaRegular",
+                                                              color: Colors
+                                                                  .black),
                                                         ),
-                                                        Row(
-                                                          children: [
-                                                            Container(
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          Container(
+                                                            decoration:
+                                                            BoxDecoration(
+                                                              color: BC.blue,
+                                                              borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                  30),
+                                                            ),
+                                                            child: InkWell(
+                                                              onTap: () {
+                                                                if (value
+                                                                    .pcounters[
+                                                                data.index]
+                                                                [
+                                                                index]
+                                                                    .value >=
+                                                                    2) {
+                                                                  value.decrementPCounter(
+                                                                      index,
+                                                                      data.index);
+                                                                }
+                                                              },
+                                                              child:
+                                                              const Icon(
+                                                                Icons.remove,
+                                                                size: 20,
+                                                                color:
+                                                                BC.white,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 10,
+                                                          ),
+                                                          Text(
+                                                            value
+                                                                .pcounters[
+                                                            data.index]
+                                                            [index]
+                                                                .value
+                                                                .toString(),
+                                                            style: TextStyle(
+                                                                fontFamily:
+                                                                "HelveticaRegular",
+                                                                fontSize:
+                                                                width *
+                                                                    0.045),
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 10,
+                                                          ),
+                                                          Container(
                                                               decoration:
-                                                                  BoxDecoration(
-                                                                color: BC.blue,
+                                                              BoxDecoration(
+                                                                color:
+                                                                BC.blue,
                                                                 borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            30),
+                                                                BorderRadius
+                                                                    .circular(
+                                                                    30),
                                                               ),
                                                               child: InkWell(
                                                                 onTap: () {
-                                                                  if (value
-                                                                          .pcounters[
-                                                                              index]
-                                                                          .value >=
-                                                                      2) {
-                                                                    value.decerementPCounter(
-                                                                        index);
-                                                                  }
+                                                                  value.incrementPCounter(
+                                                                      index,
+                                                                      data.index);
                                                                 },
                                                                 child:
-                                                                    const Icon(
-                                                                  Icons.remove,
+                                                                const Icon(
+                                                                  Icons.add,
                                                                   size: 20,
-                                                                  color:
-                                                                      BC.white,
+                                                                  color: BC
+                                                                      .white,
                                                                 ),
-                                                              ),
-                                                            ),
-                                                            const SizedBox(
-                                                              width: 10,
-                                                            ),
-                                                            Text(
-                                                              value
-                                                                  .pcounters[
-                                                                      index]
-                                                                  .value
-                                                                  .toString(),
-                                                              style: TextStyle(
-                                                                  fontFamily:
-                                                                      "HelveticaRegular",
-                                                                  fontSize:
-                                                                      width *
-                                                                          0.045),
-                                                            ),
-                                                            const SizedBox(
-                                                              width: 10,
-                                                            ),
-                                                            Container(
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color:
-                                                                      BC.blue,
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              30),
-                                                                ),
-                                                                child: InkWell(
-                                                                  onTap: () {
-                                                                    value.incrementPCounter(
-                                                                        index);
-                                                                  },
-                                                                  child:
-                                                                      const Icon(
-                                                                    Icons.add,
-                                                                    size: 20,
-                                                                    color: BC
-                                                                        .white,
-                                                                  ),
-                                                                ))
-                                                          ],
-                                                        ),
-                                                        IconButton(
-                                                            onPressed: () {
-                                                              dynamic data = value
-                                                                  .psavedItem;
+                                                              ))
+                                                        ],
+                                                      ),
+                                                      IconButton(
+                                                          onPressed: () {
+                                                            dynamic dataa =
+                                                            value.psavedItem[
+                                                            data.index];
+                                                          },
+                                                          icon: InkWell(
+                                                            onTap: () {
+                                                              value.removepitem(
+                                                                  index,
+                                                                  data.index);
                                                             },
-                                                            icon: InkWell(
-                                                              onTap: () {
-                                                                value
-                                                                    .removepitem(
-                                                                        index);
-                                                              },
-                                                              child: const Icon(
-                                                                Icons.delete,
-                                                                color: Color(
-                                                                    0xffE10000),
-                                                              ),
-                                                            ))
-                                                      ],
-                                                    ),
+                                                            child: const Icon(
+                                                              Icons.delete,
+                                                              color: Color(
+                                                                  0xffE10000),
+                                                            ),
+                                                          ))
+                                                    ],
                                                   ),
-                                                  SizedBox(
-                                                    height: height * 0.01,
-                                                  )
-                                                ],
-                                              );
-                                            },
-                                          ),
-                                        )
-                                      : const SizedBox();
-                                }
-                                return const CircularProgressIndicator();
-                              },
-                            );
-                          }),
+                                                ),
+                                                SizedBox(
+                                                  height: height * 0.01,
+                                                )
+                                              ],
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    })
+                                    : const SizedBox();
+                              }
+                              return const Center(
+                                  child: CircularProgressIndicator(
+                                    color: BC.blue,
+                                  ));
+                            },
+                          ),
                         ],
                       ),
+                      SizedBox(
+                        height: height * 0.1,
+                      )
                     ],
                   ),
                 ),
@@ -905,157 +992,169 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                   child: Center(
                     child: Consumer<AuthViewModelProvider>(
                         builder: (context, value, child) {
-                      return Rounded_Button2(
-                          width: width * 0.9,
-                          height: height * 1,
-                          title: "DONE",
-                          loading: value.loading,
-                          onPress: () async {
-                            value.setLoading(true);
-                            it.saveallid();
-                            save.addAll(it.rsavedid);
-                            save.addAll(it.psavedid);
-                            save.addAll(it.dismantlesavedid);
-                            for (int i = 0; i < save.length; i++) {
-                              item.getsavedid(save[i]);
-                            }
-                            SharedPreferences sp =
-                                await SharedPreferences.getInstance();
+                          return Rounded_Button2(
+                              width: width * 0.9,
+                              height: height * 1,
+                              title: "DONE",
+                              loading: value.loading,
+                              onPress: () async {
+                                print(it.dismantlesavedid);
+                                List<Map<String, dynamic>> updateItem = [];
+                                final sp = await SharedPreferences.getInstance();
+                                void processDropdownItems(
+                                    List<String> savedItems,
+                                    List<int> savedIds,
+                                    List<dynamic> counters,
+                                    String itemType,
+                                    String type,
+                                    ) {
+                                  for (int i = 0; i < savedIds.length; i++) {
+                                    item.getsavedid(savedIds[i], data.index);
+                                  }
+                                  for (int i = 0; i < savedItems.length; i++) {
+                                    Map<String, dynamic> itemm = {};
+                                    String name = savedItems[i];
+                                    int quantity = counters[i].value;
+                                    if (it.orderSentItemsHistory.isNotEmpty) {
+                                      List<String>? sentItemsHistory =
+                                      it.orderSentItemsHistory[data.index];
+                                      if (sentItemsHistory != null) {
+                                        int index = sentItemsHistory.indexWhere(
+                                                (element) =>
+                                                element.startsWith('$name:'));
+                                        if (index != -1) {
+                                          int historyQuantity = int.parse(
+                                              sentItemsHistory[index]
+                                                  .split(':')[1]);
+                                          if (historyQuantity < quantity) {
+                                            itemm = {
+                                              'name': name,
+                                              'quantity':
+                                              (quantity - historyQuantity)
+                                                  .toString(),
+                                              "id": savedIds[i],
+                                              "tab": "Living",
+                                              "type": type,
+                                              "parent": "498",
+                                              "parent_name": "",
+                                            };
+                                          } else if (historyQuantity == quantity) {
+                                            itemm = {};
+                                          } else {
+                                            itemm = {
+                                              'name': savedItems[i],
+                                              'quantity': quantity.toString(),
+                                              "id": savedIds[i],
+                                              "tab": "Living",
+                                              "type": type,
+                                              "parent": "498",
+                                              "parent_name": "",
+                                            };
+                                          }
+                                        } else {
+                                          itemm = {
+                                            'name': savedItems[i],
+                                            'quantity': quantity.toString(),
+                                            "id": savedIds[i],
+                                            "tab": "Living",
+                                            "type": type,
+                                            "parent": "498",
+                                            "parent_name": "",
+                                          };
+                                        }
+                                      }
+                                    } else {
+                                      itemm = {
+                                        'name': savedItems[i],
+                                        'quantity': quantity.toString(),
+                                        "id": savedIds[i],
+                                        "tab": "Living",
+                                        "type": type,
+                                        "parent": "498",
+                                        "parent_name": "",
+                                      };
+                                    }
+                                    if (itemm.isNotEmpty) {
+                                      for (int k = 0;
+                                      k < data.dataList.length;
+                                      k++) {
+                                        String id =
+                                        data.dataList[k]['name'].toString();
 
-                            List<Map<String, dynamic>> updateItem = [];
-                            if (it.rsavedItem.isNotEmpty ||
-                                it.dsavedItem.isNotEmpty ||
-                                it.psavedItem.isNotEmpty) {
-                              if (it.rsavedid.isNotEmpty) {
-                                for (int i = 0; i < it.rsavedid.length; i++) {
-                                  item.getsavedid(it.rsavedid[i]);
-                                }
-                                for (int i = 0; i < it.rsavedItem.length; i++) {
-                                  Map<String, dynamic> item = {
-                                    "name": it.rsavedItem[i],
-                                    "id": it.rsavedid[i],
-                                    "quantity": it.counters[i].value.toString(),
-                                    "type": "Reassembly Service"
-                                  };
-                                  for (int j = 0;
-                                      j < data.dataList.length;
-                                      j++) {
-                                    String id =
-                                        data.dataList[j]['name'].toString();
-                                    if (it.rsavedItem[i] == id) {
-                                      add = false;
-                                      int quantity = int.parse(
-                                              it.counters[i].value.toString()) +
-                                          int.parse(
-                                              data.dataList[j]["quantity"]);
-                                      data.dataList[j]["quantity"] =
-                                          quantity.toString();
-                                      break;
-                                    } else {
-                                      add = true;
-                                      continue;
+                                        if (itemm['name'] == id) {
+                                          add = false;
+                                          int quantity =
+                                              int.parse(itemm['quantity']) +
+                                                  int.parse(
+                                                      data.dataList[k]["quantity"]);
+                                          data.dataList[k]["quantity"] =
+                                              quantity.toString();
+                                          break;
+                                        } else {
+                                          add = true;
+                                          continue;
+                                        }
+                                      }
+                                      if (add == true && itemm.isNotEmpty) {
+                                        updateItem.add(itemm);
+                                      }
                                     }
                                   }
-                                  if (add == true) {
-                                    updateItem.add(item);
-                                  }
                                 }
-                              }
-                              add = false;
-                              if (it.dsavedItem.isNotEmpty) {
-                                for (int i = 0;
-                                    i < it.dismantlesavedid.length;
-                                    i++) {
-                                  item.getsavedid(it.dismantlesavedid[i]);
-                                }
-                                for (int i = 0; i < it.dsavedItem.length; i++) {
-                                  Map<String, dynamic> item = {
-                                    "name": it.dsavedItem[i],
-                                    "id": it.dismantlesavedid[i],
-                                    "quantity":
-                                        it.Dcounters[i].value.toString(),
-                                    "type": "Dismantling Service"
-                                  };
-                                  for (int j = 0;
-                                      j < data.dataList.length;
-                                      j++) {
-                                    String id =
-                                        data.dataList[j]['name'].toString();
-                                    if (it.dsavedItem[i] == id) {
-                                      add = false;
-                                      print(data.dataList[j]["quantity"]);
-                                      int quantity = int.parse(
-                                              it.counters[i].value.toString()) +
-                                          int.parse(
-                                              data.dataList[j]["quantity"]);
-                                      data.dataList[j]["quantity"] =
-                                          quantity.toString();
-                                      print(data.dataList[j]["quantity"]);
-                                      break;
-                                    } else {
-                                      add = true;
-                                      continue;
-                                    }
-                                  }
-                                  if (add == true) {
-                                    updateItem.add(item);
-                                  }
-                                }
-                              }
-                              add = false;
-                              if (it.psavedItem.isNotEmpty) {
-                                for (int i = 0; i < it.psavedid.length; i++) {
-                                  item.getsavedid(it.psavedid[i]);
-                                }
-                                for (int i = 0; i < it.psavedItem.length; i++) {
-                                  Map<String, dynamic> item = {
-                                    "name": it.psavedItem[i],
-                                    "id": it.psavedid[i],
-                                    "quantity":
-                                        it.pcounters[i].value.toString(),
-                                    "type": "Packing Service"
-                                  };
-                                  for (int j = 0;
-                                      j < data.dataList.length;
-                                      j++) {
-                                    String id =
-                                        data.dataList[j]['name'].toString();
-                                    if (it.psavedItem[i] == id) {
-                                      add = false;
-                                      print(data.dataList[j]["quantity"]);
-                                      int quantity = int.parse(
-                                              it.counters[i].value.toString()) +
-                                          int.parse(
-                                              data.dataList[j]["quantity"]);
-                                      data.dataList[j]["quantity"] =
-                                          quantity.toString();
-                                      print(data.dataList[j]["quantity"]);
-                                      break;
-                                    } else {
-                                      add = true;
-                                      continue;
-                                    }
-                                  }
-                                  if (add == true) {
-                                    updateItem.add(item);
-                                  }
-                                }
-                              }
-                              it.addlist();
-                              updateItem.addAll(data.dataList);
-                              value.setLoading(true);
-                              await up.UpdateItemAPI(context,
-                                  sp.get('orderId').toString(), updateItem);
-                              value.setLoading(false);
-                              Navigator.pushNamed(
-                                  context, RoutesName.singleOrder);
-                              Utilis.submitted_flushbar_message(
-                                  context, 'Success');
-                            } else {
-                              Utilis.error_flushbar_message(context, 'Error');
-                            }
-                          });
-                    }),
+
+                                processDropdownItems(
+                                    it.rsavedItem[data.index],
+                                    it.rsavedid[data.index],
+                                    it.counters[data.index],
+                                    "Reassembly Service",
+                                    "house_removal");
+                                processDropdownItems(
+                                    it.dsavedItem[data.index],
+                                    it.dismantlesavedid[data.index],
+                                    it.Dcounters[data.index],
+                                    "Dismantling Service",
+                                    "house_removal");
+                                processDropdownItems(
+                                    it.psavedItem[data.index],
+                                    it.psavedid[data.index],
+                                    it.pcounters[data.index],
+                                    "Packing Service",
+                                    "house_removal");
+                                updateItem.addAll(data.dataList);
+                                it.addlist(data.index);
+                                print(updateItem);
+                                it.storeSentItemsHistoryForOrder(
+                                  // int.parse(sp.get('orderId').toString()),
+                                    data.index,
+                                    it.dsavedItem[data.index],
+                                    it.Dcounters[data.index],
+                                    "Dismantling Service");
+                                it.storeSentItemsHistoryForOrder(
+                                  // int.parse(sp.get('orderId').toString()),
+                                    data.index,
+                                    it.psavedItem[data.index],
+                                    it.pcounters[data.index],
+                                    "Packing Service");
+                                it.storeSentItemsHistoryForOrder(
+                                    data.index,
+                                    // 1,
+                                    it.rsavedItem[data.index],
+                                    it.counters[data.index],
+                                    "Reassembly Service");
+                                value.setLoading(true);
+                                up.UpdateItemAPI(context,
+                                    sp.get('orderId').toString(), updateItem)
+                                    .then((_) {
+                                  value.setLoading(false);
+                                  Navigator.pushReplacementNamed(
+                                      context, RoutesName.singleOrder);
+                                  Utilis.submitted_flushbar_message(
+                                      context, 'Success');
+                                }).catchError((error) {
+                                  Utilis.error_flushbar_message(context, 'Error');
+                                });
+                              });
+                        }),
                   ),
                 ),
               ],

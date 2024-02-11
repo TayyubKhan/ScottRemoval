@@ -38,7 +38,7 @@ class SignatureRepo {
       final response =
           await request.send().timeout(const Duration(seconds: 10));
       dynamic jsonResponse = json.decode(await response.stream.bytesToString());
-      log("Signture status:" + jsonResponse.toString());
+      log("Signture status:$jsonResponse");
       if (jsonResponse['status'] == 200) {
         Utilis.Snackbar_Message(context, 'Submitted');
         myrepo.setLoading(false);

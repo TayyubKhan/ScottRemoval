@@ -17,13 +17,11 @@ class SplashServices {
       if (value.loginToken.toString() == 'null' ||
           value.loginToken.toString() == '') {
         await Future.delayed(const Duration(seconds: 3));
-        Navigator.pushNamed(context, RoutesName.login);
+        Navigator.pushReplacementNamed(context, RoutesName.login);
       } else {
         fk.fetchCookieAndLoginToken();
-        await Future.delayed(const Duration(milliseconds: 1));
-        Navigator.pushNamed(context, RoutesName.home);
-        // Navigator.push(
-        //     context, MaterialPageRoute(builder: (context) => Temp()));
+        await Future.delayed(const Duration(seconds: 3));
+        Navigator.pushReplacementNamed(context, RoutesName.home);
       }
     }).onError((error, stackTrace) {
       if (kDebugMode) {

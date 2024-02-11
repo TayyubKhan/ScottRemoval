@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -55,6 +56,7 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
     final show = Provider.of<AuthViewModelProvider>(context);
     final dvv = Provider.of<DataViewViewModel>(context);
     final it = Provider.of<ItemViewViewModel>(context, listen: true);
+    final temp = Provider.of<ItemViewViewModel>(context, listen: true);
     final exit = Provider.of<ExtraItemViewViewModel>(context, listen: true);
     var height = MediaQuery.sizeOf(context).height;
     var width = MediaQuery.sizeOf(context).width;
@@ -66,7 +68,7 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
       child: Scaffold(
           resizeToAvoidBottomInset: false,
           key: _scaffold,
-          drawer: MyDrawer(),
+          drawer: const MyDrawer(),
           appBar: AppBar(
             backgroundColor: BC.login,
             toolbarHeight: height * 0.08,
@@ -74,7 +76,11 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                 onPressed: () {
                   _scaffold.currentState?.openDrawer();
                 },
-                icon: const Icon(Icons.menu, size: 32)),
+                icon: const Icon(
+                  Icons.menu,
+                  size: 32,
+                  color: BC.white,
+                )),
             title: Text(
               'My Orders',
               style: TextStyle(
@@ -185,798 +191,850 @@ class _Home_screen_ViewState extends State<Home_screen_View> {
                                     child: const Center(
                                         child: Text('Refresh Please')));
                           }
-                          return Column(
-                            children: [
-                              ListView.builder(
-                                physics: const NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 10),
-                                itemCount: snapshot.data!.orderCount,
-                                itemBuilder: ((context, index) {
-                                  String id =
-                                      snapshot.data!.data![index].id.toString();
-                                  if (searchcontroller.text.isEmpty) {
-                                    return Column(
-                                      children: [
-                                        Column(
-                                          children: [
-                                            InkWell(
-                                              onTap: () async {
-                                                SharedPreferences sp =
-                                                    await SharedPreferences
-                                                        .getInstance();
-                                                sp.setString(
-                                                    'orderId',
-                                                    snapshot
-                                                        .data!.data![index].id);
-                                                sp.setString(
-                                                    'user_id',
-                                                    snapshot.data!.data![index]
-                                                        .userId
-                                                        .toString());
-                                                if (snapshot.data!.orderCount !=
-                                                    dvv.signature.length) {
-                                                  log('created');
-                                                  dvv.createwavdata(snapshot
-                                                      .data!.orderCount);
-                                                }
-                                                if (sp
-                                                        .get('orderId')
-                                                        .toString() !=
-                                                    snapshot
-                                                        .data!.data![index].id
-                                                        .toString()) {
-                                                  it.clear();
-                                                  exit.clear();
-                                                }
-                                                sp.setString(
-                                                    'orderId',
-                                                    snapshot
-                                                        .data!.data![index].id);
-                                                dvv.setIndex(index);
-                                                dvv.setStatus(true);
-                                                String desc =
-                                                    '${snapshot.data!.data![index].orderType.toString()}(est. ${snapshot.data!.data![index].productVolume.toString()},${snapshot.data!.data![index].persons.toString()} men)';
-                                                dvv.clear();
-                                                dvv.setData([
-                                                  snapshot.data!.data![index]
-                                                      .deliveryAddress
-                                                      .toString(),
-                                                  desc.toString(),
-                                                  snapshot.data!.data![index].id
-                                                      .toString(),
-                                                  index.toString(),
-                                                ]);
-
-                                                Navigator.pushReplacementNamed(
-                                                    context,
-                                                    RoutesName.singleOrder);
-                                              },
-                                              child: IntrinsicHeight(
-                                                child: Row(
-                                                  children: [
-                                                    Container(
-                                                      width: 8,
-                                                      decoration: BoxDecoration(
-                                                          color:
-                                                              selectedIndex ==
-                                                                      index
-                                                                  ? BC.green
-                                                                  : BC.white,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(5)),
-                                                    ),
-                                                    Container(
-                                                      width: width * 0.96,
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 20,
-                                                          vertical: 5),
-                                                      child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                Text(
-                                                                  snapshot
-                                                                      .data!
-                                                                      .data![
-                                                                          index]
-                                                                      .trackingID
-                                                                      .toString(),
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontFamily:
-                                                                        "HelveticaRegular",
-                                                                    color: BC
-                                                                        .lightGrey,
-                                                                    fontSize:
-                                                                        width *
-                                                                            0.038,
-                                                                  ),
-                                                                ),
-                                                                Container(
-                                                                  padding: const EdgeInsets
-                                                                      .symmetric(
-                                                                      horizontal:
-                                                                          10,
-                                                                      vertical:
-                                                                          5),
-                                                                  decoration: BoxDecoration(
-                                                                      color: BC
-                                                                          .green,
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              15)),
-                                                                  child: Center(
-                                                                    child: Text(
-                                                                      'Pick Up',
-                                                                      style: TextStyle(
-                                                                          color: BC
-                                                                              .white,
+                          return snapshot.data!.orderCount != 0
+                              ? Column(
+                                  children: [
+                                    ListView.builder(
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      shrinkWrap: true,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10),
+                                      itemCount: snapshot.data!.orderCount!,
+                                      itemBuilder: ((context, index) {
+                                        String id = snapshot
+                                            .data!.data![index].id
+                                            .toString();
+                                        if (searchcontroller.text.isEmpty) {
+                                          return Column(
+                                            children: [
+                                              Column(
+                                                children: [
+                                                  InkWell(
+                                                    onTap: () async {
+                                                      SharedPreferences sp =
+                                                          await SharedPreferences
+                                                              .getInstance();
+                                                      sp.setString(
+                                                          'orderId',
+                                                          snapshot.data!
+                                                              .data![index].id);
+                                                      sp.setString(
+                                                          'user_id',
+                                                          snapshot
+                                                              .data!
+                                                              .data![index]
+                                                              .userId
+                                                              .toString());
+                                                      if (snapshot.data!
+                                                              .orderCount !=
+                                                          dvv.signature
+                                                              .length) {
+                                                        log('created');
+                                                        dvv.createwavdata(
+                                                            snapshot.data!
+                                                                .orderCount);
+                                                        temp.generate(snapshot
+                                                            .data!.orderCount);
+                                                        exit.generate(snapshot
+                                                            .data!.orderCount);
+                                                      }
+                                                      if (sp
+                                                              .get('orderId')
+                                                              .toString() !=
+                                                          snapshot.data!
+                                                              .data![index].id
+                                                              .toString()) {
+                                                        // it.clear();
+                                                        // exit.clear();
+                                                      }
+                                                      sp.setString(
+                                                          'orderId',
+                                                          snapshot.data!
+                                                              .data![index].id);
+                                                      dvv.getLocation({
+                                                        'pickup': snapshot
+                                                            .data!
+                                                            .data![index]
+                                                            .pickupAddress,
+                                                        'slug': snapshot.data!
+                                                            .data![index].slug!,
+                                                      }, index);
+                                                      dvv.setIndex(index);
+                                                      dvv.setStatus(true);
+                                                      String desc =
+                                                          '${snapshot.data!.data![index].orderType.toString()}(est. ${snapshot.data!.data![index].productVolume.toString()},${snapshot.data!.data![index].persons.toString()} men)';
+                                                      dvv.clear();
+                                                      dvv.setData([
+                                                        snapshot
+                                                            .data!
+                                                            .data![index]
+                                                            .deliveryAddress
+                                                            .toString(),
+                                                        desc.toString(),
+                                                        snapshot.data!
+                                                            .data![index].id
+                                                            .toString(),
+                                                        index.toString(),
+                                                      ]);
+                                                      List<Map<String, dynamic>>
+                                                          dt = [];
+                                                      if (snapshot
+                                                          .data!
+                                                          .data![index]
+                                                          .productsList!
+                                                          .toString()
+                                                          .isNotEmpty) {
+                                                        dt = List<
+                                                                Map<String,
+                                                                    dynamic>>.from(
+                                                            jsonDecode(snapshot
+                                                                .data!
+                                                                .data![index]
+                                                                .productsList!
+                                                                .toString()));
+                                                      }
+                                                      dvv.getId(dt, index);
+                                                      Navigator
+                                                          .pushReplacementNamed(
+                                                              context,
+                                                              RoutesName
+                                                                  .singleOrder);
+                                                    },
+                                                    child: IntrinsicHeight(
+                                                      child: Row(
+                                                        children: [
+                                                          Container(
+                                                            width: 8,
+                                                            decoration: BoxDecoration(
+                                                                color: selectedIndex ==
+                                                                        index
+                                                                    ? BC.green
+                                                                    : BC.white,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            5)),
+                                                          ),
+                                                          Container(
+                                                            width: width * 0.96,
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        20,
+                                                                    vertical:
+                                                                        5),
+                                                            child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .spaceBetween,
+                                                                    children: [
+                                                                      Text(
+                                                                        snapshot
+                                                                            .data!
+                                                                            .data![index]
+                                                                            .trackingID
+                                                                            .toString(),
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontFamily:
+                                                                              "HelveticaRegular",
+                                                                          color:
+                                                                              Colors.black,
                                                                           fontSize:
-                                                                              width * 0.036),
+                                                                              width * 0.038,
+                                                                        ),
+                                                                      ),
+                                                                      Container(
+                                                                        padding: const EdgeInsets
+                                                                            .symmetric(
+                                                                            horizontal:
+                                                                                10,
+                                                                            vertical:
+                                                                                5),
+                                                                        decoration: BoxDecoration(
+                                                                            color:
+                                                                                BC.green,
+                                                                            borderRadius: BorderRadius.circular(15)),
+                                                                        child:
+                                                                            Center(
+                                                                          child:
+                                                                              Text(
+                                                                            'Pick Up',
+                                                                            style:
+                                                                                TextStyle(color: BC.white, fontSize: width * 0.036),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height:
+                                                                        height *
+                                                                            0.01,
+                                                                  ),
+                                                                  Expanded(
+                                                                    child:
+                                                                        Container(
+                                                                      padding: const EdgeInsets
+                                                                          .only(
+                                                                          right:
+                                                                              10),
+                                                                      width: MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .width,
+                                                                      child:
+                                                                          Text(
+                                                                        snapshot
+                                                                            .data!
+                                                                            .data![index]
+                                                                            .pickupAddress
+                                                                            .toString(),
+                                                                        maxLines:
+                                                                            2,
+                                                                        overflow:
+                                                                            TextOverflow.ellipsis,
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontFamily:
+                                                                              "HelveticaBold",
+                                                                          color:
+                                                                              Colors.black,
+                                                                          fontSize:
+                                                                              width * 0.05,
+                                                                          fontWeight:
+                                                                              FontWeight.w600,
+                                                                        ),
+                                                                      ),
                                                                     ),
                                                                   ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            SizedBox(
-                                                              height:
-                                                                  height * 0.01,
-                                                            ),
-                                                            Expanded(
-                                                              child: Container(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .only(
-                                                                        right:
-                                                                            10),
-                                                                width: MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width,
-                                                                child: Text(
-                                                                  snapshot
-                                                                      .data!
-                                                                      .data![
-                                                                          index]
-                                                                      .pickupAddress
-                                                                      .toString(),
-                                                                  maxLines: 2,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontFamily:
-                                                                        "HelveticaBold",
-                                                                    color: Colors
-                                                                        .black,
-                                                                    fontSize:
-                                                                        width *
-                                                                            0.05,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
+                                                                  SizedBox(
+                                                                    height:
+                                                                        height *
+                                                                            0.01,
                                                                   ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            SizedBox(
-                                                              height:
-                                                                  height * 0.01,
-                                                            ),
-                                                            Text(
-                                                              '${snapshot.data!.data![index].orderType.toString()}(est. ${snapshot.data!.data![index].productVolume.toString()} m3,${snapshot.data!.data![index].persons.toString()} men)',
-                                                              style: TextStyle(
-                                                                fontFamily:
-                                                                    "HelveticaRegular",
-                                                                color: Colors
-                                                                    .black,
-                                                                fontSize:
-                                                                    width *
-                                                                        0.036,
-                                                              ),
-                                                            ),
-                                                          ]),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                            const Divider(
-                                              thickness: 2,
-                                            )
-                                          ],
-                                        ),
-                                        Column(
-                                          children: [
-                                            InkWell(
-                                              onTap: () async {
-                                                SharedPreferences sp =
-                                                    await SharedPreferences
-                                                        .getInstance();
-
-                                                if (sp
-                                                        .get('orderId')
-                                                        .toString() !=
-                                                    snapshot
-                                                        .data!.data![index].id
-                                                        .toString()) {
-                                                  print('created');
-
-                                                  it.clear();
-                                                  exit.clear();
-                                                }
-                                                sp.setString(
-                                                    'orderId',
-                                                    snapshot
-                                                        .data!.data![index].id);
-                                                // await pk.PickupApi(context, '0',
-                                                //     sp.get('orderId').toString());
-                                                // await dr.DropApi(context, '0',
-                                                //     sp.get('orderId').toString());
-                                                // sp.remove('orderId');
-                                                dvv.setIndex(index);
-                                                dvv.setStatus(false);
-
-                                                String desc =
-                                                    '${snapshot.data!.data![index].orderType.toString()}(est. ${snapshot.data!.data![index].productVolume.toString()},${snapshot.data!.data![index].persons.toString()} men)';
-                                                dvv.clear();
-                                                dvv.setData([
-                                                  snapshot.data!.data![index]
-                                                      .deliveryAddress
-                                                      .toString(),
-                                                  desc.toString(),
-                                                  snapshot.data!.data![index].id
-                                                      .toString(),
-                                                  index.toString(),
-                                                ]);
-                                                Navigator.pushReplacementNamed(
-                                                    context,
-                                                    RoutesName.singleOrder);
-                                              },
-                                              child: IntrinsicHeight(
-                                                child: Row(
-                                                  children: [
-                                                    Container(
-                                                      width: 8,
-                                                      decoration: BoxDecoration(
-                                                          color:
-                                                              selectedIndex ==
-                                                                      index
-                                                                  ? Colors.red
-                                                                  : BC.white,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(5)),
-                                                    ),
-                                                    Container(
-                                                      width: width * 0.96,
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 20,
-                                                          vertical: 5),
-                                                      child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                Text(
-                                                                  snapshot
-                                                                      .data!
-                                                                      .data![
-                                                                          index]
-                                                                      .trackingID
-                                                                      .toString(),
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontFamily:
-                                                                        "HelveticaRegular",
-                                                                    color: BC
-                                                                        .lightGrey,
-                                                                    fontSize:
-                                                                        width *
-                                                                            0.038,
-                                                                  ),
-                                                                ),
-                                                                Container(
-                                                                  padding: const EdgeInsets
-                                                                      .symmetric(
-                                                                      horizontal:
-                                                                          10,
-                                                                      vertical:
-                                                                          5),
-                                                                  decoration: BoxDecoration(
+                                                                  Text(
+                                                                    '${snapshot.data!.data![index].orderType.toString()}(est. ${snapshot.data!.data![index].productVolume.toString()} m3,${snapshot.data!.data![index].persons.toString()} men)',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontFamily:
+                                                                          "HelveticaRegular",
                                                                       color: Colors
-                                                                          .red,
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              15)),
-                                                                  child: Center(
-                                                                    child: Text(
-                                                                      'Drop Off',
-                                                                      style: TextStyle(
-                                                                          color: BC
-                                                                              .white,
-                                                                          fontSize:
-                                                                              width * 0.036),
+                                                                          .black,
+                                                                      fontSize:
+                                                                          width *
+                                                                              0.036,
                                                                     ),
                                                                   ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            SizedBox(
-                                                              height:
-                                                                  height * 0.01,
-                                                            ),
-                                                            Expanded(
-                                                              child: Container(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .only(
-                                                                        right:
-                                                                            10),
-                                                                width: MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width,
-                                                                child: Text(
-                                                                  snapshot
-                                                                      .data!
-                                                                      .data![
-                                                                          index]
-                                                                      .deliveryAddress
-                                                                      .toString(),
-                                                                  maxLines: 2,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontFamily:
-                                                                        "HelveticaBold",
-                                                                    color: Colors
-                                                                        .black,
-                                                                    fontSize:
-                                                                        width *
-                                                                            0.05,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            SizedBox(
-                                                              height:
-                                                                  height * 0.01,
-                                                            ),
-                                                            Text(
-                                                              '${snapshot.data!.data![index].orderType.toString()}(est. ${snapshot.data!.data![index].productVolume.toString()} m3,${snapshot.data!.data![index].persons.toString()} men)',
-                                                              style: TextStyle(
-                                                                fontFamily:
-                                                                    "HelveticaRegular",
-                                                                color: Colors
-                                                                    .black,
-                                                                fontSize:
-                                                                    width *
-                                                                        0.036,
-                                                              ),
-                                                            ),
-                                                          ]),
+                                                                ]),
+                                                          ),
+                                                        ],
+                                                      ),
                                                     ),
-                                                  ],
-                                                ),
+                                                  ),
+                                                  const Divider(
+                                                    thickness: 2,
+                                                  )
+                                                ],
                                               ),
-                                            ),
-                                            const Divider(
-                                              thickness: 2,
-                                            )
-                                          ],
-                                        )
-                                      ],
-                                    );
-                                  } else if (id
-                                      .contains(searchcontroller.text)) {
-                                    return Column(
-                                      children: [
-                                        Column(
-                                          children: [
-                                            InkWell(
-                                              onTap: () async {
-                                                SharedPreferences sp =
-                                                    await SharedPreferences
-                                                        .getInstance();
+                                              Column(
+                                                children: [
+                                                  InkWell(
+                                                    onTap: () async {
+                                                      SharedPreferences sp =
+                                                          await SharedPreferences
+                                                              .getInstance();
 
-                                                if (sp
-                                                        .get('orderId')
-                                                        .toString() !=
-                                                    snapshot
-                                                        .data!.data![index].id
-                                                        .toString()) {
-                                                  it.clear();
-                                                  exit.clear();
-                                                }
-                                                sp.setString(
-                                                    'orderId',
-                                                    snapshot
-                                                        .data!.data![index].id);
-                                                // await pk.PickupApi(context, '0',
-                                                //     sp.get('orderId').toString());
-                                                // await dr.DropApi(context, '0',
-                                                //     sp.get('orderId').toString());
-                                                // sp.remove('orderId');
-                                                dvv.setIndex(index);
-                                                dvv.setStatus(true);
-                                                String desc =
-                                                    '${snapshot.data!.data![index].orderType.toString()}(est. ${snapshot.data!.data![index].productVolume.toString()},${snapshot.data!.data![index].persons.toString()} men)';
-                                                dvv.clear();
-                                                dvv.setData([
-                                                  snapshot.data!.data![index]
-                                                      .deliveryAddress
-                                                      .toString(),
-                                                  desc.toString(),
-                                                  snapshot.data!.data![index].id
-                                                      .toString(),
-                                                  index.toString(),
-                                                ]);
-                                                Navigator.pushReplacementNamed(
-                                                    context,
-                                                    RoutesName.singleOrder);
-                                              },
-                                              child: IntrinsicHeight(
-                                                child: Row(
-                                                  children: [
-                                                    Container(
-                                                      width: 8,
-                                                      decoration: BoxDecoration(
-                                                          color:
-                                                              selectedIndex ==
-                                                                      index
-                                                                  ? BC.green
-                                                                  : BC.white,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(5)),
-                                                    ),
-                                                    Container(
-                                                      width: width * 0.96,
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 20,
-                                                          vertical: 5),
-                                                      child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                Text(
-                                                                  snapshot
-                                                                      .data!
-                                                                      .data![
-                                                                          index]
-                                                                      .orderId
-                                                                      .toString(),
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontFamily:
-                                                                        "HelveticaRegular",
-                                                                    color: BC
-                                                                        .lightGrey,
-                                                                    fontSize:
-                                                                        width *
-                                                                            0.038,
-                                                                  ),
-                                                                ),
-                                                                Container(
-                                                                  padding: const EdgeInsets
-                                                                      .symmetric(
-                                                                      horizontal:
-                                                                          10,
-                                                                      vertical:
-                                                                          5),
-                                                                  decoration: BoxDecoration(
-                                                                      color: BC
-                                                                          .green,
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              15)),
-                                                                  child: Center(
-                                                                    child: Text(
-                                                                      'Pick Up',
-                                                                      style: TextStyle(
-                                                                          color: BC
-                                                                              .white,
+                                                      if (sp
+                                                              .get('orderId')
+                                                              .toString() !=
+                                                          snapshot.data!
+                                                              .data![index].id
+                                                              .toString()) {
+                                                        print('created');
+                                                        // it.clear();
+                                                        // exit.clear();
+                                                      }
+                                                      sp.setString(
+                                                          'orderId',
+                                                          snapshot.data!
+                                                              .data![index].id);
+                                                      // await pk.PickupApi(context, '0',
+                                                      //     sp.get('orderId').toString());
+                                                      // await dr.DropApi(context, '0',
+                                                      //     sp.get('orderId').toString());
+                                                      // sp.remove('orderId');
+                                                      dvv.setIndex(index);
+                                                      dvv.setStatus(false);
+                                                      String desc =
+                                                          '${snapshot.data!.data![index].orderType.toString()}(est. ${snapshot.data!.data![index].productVolume.toString()},${snapshot.data!.data![index].persons.toString()} men)';
+                                                      dvv.clear();
+                                                      dvv.setData([
+                                                        snapshot
+                                                            .data!
+                                                            .data![index]
+                                                            .deliveryAddress
+                                                            .toString(),
+                                                        desc.toString(),
+                                                        snapshot.data!
+                                                            .data![index].id
+                                                            .toString(),
+                                                        index.toString(),
+                                                      ]);
+                                                      Navigator
+                                                          .pushReplacementNamed(
+                                                              context,
+                                                              RoutesName
+                                                                  .singleOrder);
+                                                    },
+                                                    child: IntrinsicHeight(
+                                                      child: Row(
+                                                        children: [
+                                                          Container(
+                                                            width: 8,
+                                                            decoration: BoxDecoration(
+                                                                color: selectedIndex ==
+                                                                        index
+                                                                    ? Colors.red
+                                                                    : BC.white,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            5)),
+                                                          ),
+                                                          Container(
+                                                            width: width * 0.96,
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        20,
+                                                                    vertical:
+                                                                        5),
+                                                            child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .spaceBetween,
+                                                                    children: [
+                                                                      Text(
+                                                                        snapshot
+                                                                            .data!
+                                                                            .data![index]
+                                                                            .trackingID
+                                                                            .toString(),
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontFamily:
+                                                                              "HelveticaRegular",
+                                                                          color:
+                                                                              Colors.black,
                                                                           fontSize:
-                                                                              width * 0.036),
+                                                                              width * 0.038,
+                                                                        ),
+                                                                      ),
+                                                                      Container(
+                                                                        padding: const EdgeInsets
+                                                                            .symmetric(
+                                                                            horizontal:
+                                                                                10,
+                                                                            vertical:
+                                                                                5),
+                                                                        decoration: BoxDecoration(
+                                                                            color:
+                                                                                Colors.red,
+                                                                            borderRadius: BorderRadius.circular(15)),
+                                                                        child:
+                                                                            Center(
+                                                                          child:
+                                                                              Text(
+                                                                            'Drop Off',
+                                                                            style:
+                                                                                TextStyle(color: BC.white, fontSize: width * 0.036),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height:
+                                                                        height *
+                                                                            0.01,
+                                                                  ),
+                                                                  Expanded(
+                                                                    child:
+                                                                        Container(
+                                                                      padding: const EdgeInsets
+                                                                          .only(
+                                                                          right:
+                                                                              10),
+                                                                      width: MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .width,
+                                                                      child:
+                                                                          Text(
+                                                                        snapshot
+                                                                            .data!
+                                                                            .data![index]
+                                                                            .deliveryAddress
+                                                                            .toString(),
+                                                                        maxLines:
+                                                                            2,
+                                                                        overflow:
+                                                                            TextOverflow.ellipsis,
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontFamily:
+                                                                              "HelveticaBold",
+                                                                          color:
+                                                                              Colors.black,
+                                                                          fontSize:
+                                                                              width * 0.05,
+                                                                          fontWeight:
+                                                                              FontWeight.w600,
+                                                                        ),
+                                                                      ),
                                                                     ),
                                                                   ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            SizedBox(
-                                                              height:
-                                                                  height * 0.01,
-                                                            ),
-                                                            Expanded(
-                                                              child: Container(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .only(
-                                                                        right:
-                                                                            10),
-                                                                width: MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width,
-                                                                child: Text(
-                                                                  snapshot
-                                                                      .data!
-                                                                      .data![
-                                                                          index]
-                                                                      .pickupAddress
-                                                                      .toString(),
-                                                                  maxLines: 2,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontFamily:
-                                                                        "HelveticaBold",
-                                                                    color: Colors
-                                                                        .black,
-                                                                    fontSize:
-                                                                        width *
-                                                                            0.05,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
+                                                                  SizedBox(
+                                                                    height:
+                                                                        height *
+                                                                            0.01,
                                                                   ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            SizedBox(
-                                                              height:
-                                                                  height * 0.01,
-                                                            ),
-                                                            Text(
-                                                              '${snapshot.data!.data![index].orderType.toString()}(est. ${snapshot.data!.data![index].productVolume.toString()} m3,${snapshot.data!.data![index].persons.toString()} men)',
-                                                              style: TextStyle(
-                                                                fontFamily:
-                                                                    "HelveticaRegular",
-                                                                color: Colors
-                                                                    .black,
-                                                                fontSize:
-                                                                    width *
-                                                                        0.036,
-                                                              ),
-                                                            ),
-                                                          ]),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                            const Divider(
-                                              thickness: 2,
-                                            )
-                                          ],
-                                        ),
-                                        Column(
-                                          children: [
-                                            InkWell(
-                                              onTap: () async {
-                                                SharedPreferences sp =
-                                                    await SharedPreferences
-                                                        .getInstance();
-
-                                                if (sp
-                                                        .get('orderId')
-                                                        .toString() !=
-                                                    snapshot
-                                                        .data!.data![index].id
-                                                        .toString()) {
-                                                  print('created');
-                                                  it.clear();
-                                                  exit.clear();
-                                                }
-
-                                                // await pk.PickupApi(context, '0',
-                                                //     sp.get('orderId').toString());
-                                                // await dr.DropApi(context, '0',
-                                                //     sp.get('orderId').toString());
-                                                // sp.remove('orderId');
-                                                dvv.setIndex(index);
-                                                dvv.setStatus(false);
-                                                String desc =
-                                                    '${snapshot.data!.data![index].orderType.toString()}(est. ${snapshot.data!.data![index].productVolume.toString()},${snapshot.data!.data![index].persons.toString()} men)';
-                                                dvv.clear();
-                                                dvv.setData([
-                                                  snapshot.data!.data![index]
-                                                      .deliveryAddress
-                                                      .toString(),
-                                                  desc.toString(),
-                                                  snapshot.data!.data![index].id
-                                                      .toString(),
-                                                  index.toString(),
-                                                ]);
-                                                Navigator.pushReplacementNamed(
-                                                    context,
-                                                    RoutesName.singleOrder);
-                                              },
-                                              child: IntrinsicHeight(
-                                                child: Row(
-                                                  children: [
-                                                    Container(
-                                                      width: 8,
-                                                      decoration: BoxDecoration(
-                                                          color:
-                                                              selectedIndex ==
-                                                                      index
-                                                                  ? BC.green
-                                                                  : BC.white,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(5)),
-                                                    ),
-                                                    Container(
-                                                      width: width * 0.96,
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 20,
-                                                          vertical: 5),
-                                                      child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                Text(
-                                                                  snapshot
-                                                                      .data!
-                                                                      .data![
-                                                                          index]
-                                                                      .orderId
-                                                                      .toString(),
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontFamily:
-                                                                        "HelveticaRegular",
-                                                                    color: BC
-                                                                        .lightGrey,
-                                                                    fontSize:
-                                                                        width *
-                                                                            0.038,
-                                                                  ),
-                                                                ),
-                                                                Container(
-                                                                  padding: const EdgeInsets
-                                                                      .symmetric(
-                                                                      horizontal:
-                                                                          10,
-                                                                      vertical:
-                                                                          5),
-                                                                  decoration: BoxDecoration(
+                                                                  Text(
+                                                                    '${snapshot.data!.data![index].orderType.toString()}(est. ${snapshot.data!.data![index].productVolume.toString()} m3,${snapshot.data!.data![index].persons.toString()} men)',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontFamily:
+                                                                          "HelveticaRegular",
                                                                       color: Colors
-                                                                          .red,
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              15)),
-                                                                  child: Center(
-                                                                    child: Text(
-                                                                      'Drop Off',
-                                                                      style: TextStyle(
-                                                                          color: BC
-                                                                              .white,
-                                                                          fontSize:
-                                                                              width * 0.036),
+                                                                          .black,
+                                                                      fontSize:
+                                                                          width *
+                                                                              0.036,
                                                                     ),
                                                                   ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            SizedBox(
-                                                              height:
-                                                                  height * 0.01,
-                                                            ),
-                                                            Expanded(
-                                                              child: Container(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .only(
-                                                                        right:
-                                                                            10),
-                                                                width: MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width,
-                                                                child: Text(
-                                                                  snapshot
-                                                                      .data!
-                                                                      .data![
-                                                                          index]
-                                                                      .deliveryAddress
-                                                                      .toString(),
-                                                                  maxLines: 2,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontFamily:
-                                                                        "HelveticaBold",
-                                                                    color: Colors
-                                                                        .black,
-                                                                    fontSize:
-                                                                        width *
-                                                                            0.05,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            SizedBox(
-                                                              height:
-                                                                  height * 0.01,
-                                                            ),
-                                                            Text(
-                                                              '${snapshot.data!.data![index].orderType.toString()}(est. ${snapshot.data!.data![index].productVolume.toString()} m3,${snapshot.data!.data![index].persons.toString()} men)',
-                                                              style: TextStyle(
-                                                                fontFamily:
-                                                                    "HelveticaRegular",
-                                                                color: Colors
-                                                                    .black,
-                                                                fontSize:
-                                                                    width *
-                                                                        0.036,
-                                                              ),
-                                                            ),
-                                                          ]),
+                                                                ]),
+                                                          ),
+                                                        ],
+                                                      ),
                                                     ),
-                                                  ],
-                                                ),
+                                                  ),
+                                                  const Divider(
+                                                    thickness: 2,
+                                                  )
+                                                ],
+                                              )
+                                            ],
+                                          );
+                                        } else if (id
+                                            .contains(searchcontroller.text)) {
+                                          return Column(
+                                            children: [
+                                              Column(
+                                                children: [
+                                                  InkWell(
+                                                    onTap: () async {
+                                                      SharedPreferences sp =
+                                                          await SharedPreferences
+                                                              .getInstance();
+
+                                                      if (sp
+                                                              .get('orderId')
+                                                              .toString() !=
+                                                          snapshot.data!
+                                                              .data![index].id
+                                                              .toString()) {
+                                                        // it.clear();
+                                                        // exit.clear();
+                                                      }
+                                                      sp.setString(
+                                                          'orderId',
+                                                          snapshot.data!
+                                                              .data![index].id);
+                                                      // await pk.PickupApi(context, '0',
+                                                      //     sp.get('orderId').toString());
+                                                      // await dr.DropApi(context, '0',
+                                                      //     sp.get('orderId').toString());
+                                                      // sp.remove('orderId');
+                                                      dvv.setIndex(index);
+                                                      dvv.setStatus(true);
+                                                      String desc =
+                                                          '${snapshot.data!.data![index].orderType.toString()}(est. ${snapshot.data!.data![index].productVolume.toString()},${snapshot.data!.data![index].persons.toString()} men)';
+                                                      dvv.clear();
+                                                      dvv.setData([
+                                                        snapshot
+                                                            .data!
+                                                            .data![index]
+                                                            .deliveryAddress
+                                                            .toString(),
+                                                        desc.toString(),
+                                                        snapshot.data!
+                                                            .data![index].id
+                                                            .toString(),
+                                                        index.toString(),
+                                                      ]);
+                                                      Navigator
+                                                          .pushReplacementNamed(
+                                                              context,
+                                                              RoutesName
+                                                                  .singleOrder);
+                                                    },
+                                                    child: IntrinsicHeight(
+                                                      child: Row(
+                                                        children: [
+                                                          Container(
+                                                            width: 8,
+                                                            decoration: BoxDecoration(
+                                                                color: selectedIndex ==
+                                                                        index
+                                                                    ? BC.green
+                                                                    : BC.white,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            5)),
+                                                          ),
+                                                          Container(
+                                                            width: width * 0.96,
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        20,
+                                                                    vertical:
+                                                                        5),
+                                                            child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .spaceBetween,
+                                                                    children: [
+                                                                      Text(
+                                                                        snapshot
+                                                                            .data!
+                                                                            .data![index]
+                                                                            .orderId
+                                                                            .toString(),
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontFamily:
+                                                                              "HelveticaRegular",
+                                                                          color:
+                                                                              BC.lightGrey,
+                                                                          fontSize:
+                                                                              width * 0.038,
+                                                                        ),
+                                                                      ),
+                                                                      Container(
+                                                                        padding: const EdgeInsets
+                                                                            .symmetric(
+                                                                            horizontal:
+                                                                                10,
+                                                                            vertical:
+                                                                                5),
+                                                                        decoration: BoxDecoration(
+                                                                            color:
+                                                                                BC.green,
+                                                                            borderRadius: BorderRadius.circular(15)),
+                                                                        child:
+                                                                            Center(
+                                                                          child:
+                                                                              Text(
+                                                                            'Pick Up',
+                                                                            style:
+                                                                                TextStyle(color: BC.white, fontSize: width * 0.036),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height:
+                                                                        height *
+                                                                            0.01,
+                                                                  ),
+                                                                  Expanded(
+                                                                    child:
+                                                                        Container(
+                                                                      padding: const EdgeInsets
+                                                                          .only(
+                                                                          right:
+                                                                              10),
+                                                                      width: MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .width,
+                                                                      child:
+                                                                          Text(
+                                                                        snapshot
+                                                                            .data!
+                                                                            .data![index]
+                                                                            .pickupAddress
+                                                                            .toString(),
+                                                                        maxLines:
+                                                                            2,
+                                                                        overflow:
+                                                                            TextOverflow.ellipsis,
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontFamily:
+                                                                              "HelveticaBold",
+                                                                          color:
+                                                                              Colors.black,
+                                                                          fontSize:
+                                                                              width * 0.05,
+                                                                          fontWeight:
+                                                                              FontWeight.w600,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height:
+                                                                        height *
+                                                                            0.01,
+                                                                  ),
+                                                                  Text(
+                                                                    '${snapshot.data!.data![index].orderType.toString()}(est. ${snapshot.data!.data![index].productVolume.toString()} m3,${snapshot.data!.data![index].persons.toString()} men)',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontFamily:
+                                                                          "HelveticaRegular",
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontSize:
+                                                                          width *
+                                                                              0.036,
+                                                                    ),
+                                                                  ),
+                                                                ]),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const Divider(
+                                                    thickness: 2,
+                                                  )
+                                                ],
                                               ),
-                                            ),
-                                            const Divider(
-                                              thickness: 2,
-                                            )
-                                          ],
-                                        )
-                                      ],
-                                    );
-                                  } else {
-                                    return const SizedBox();
-                                  }
-                                }),
-                              ),
-                            ],
-                          );
+                                              Column(
+                                                children: [
+                                                  InkWell(
+                                                    onTap: () async {
+                                                      SharedPreferences sp =
+                                                          await SharedPreferences
+                                                              .getInstance();
+
+                                                      if (sp
+                                                              .get('orderId')
+                                                              .toString() !=
+                                                          snapshot.data!
+                                                              .data![index].id
+                                                              .toString()) {
+                                                        print('created');
+                                                        // it.clear();
+                                                        // exit.clear();
+                                                      }
+
+                                                      // await pk.PickupApi(context, '0',
+                                                      //     sp.get('orderId').toString());
+                                                      // await dr.DropApi(context, '0',
+                                                      //     sp.get('orderId').toString());
+                                                      // sp.remove('orderId');
+                                                      dvv.setIndex(index);
+                                                      dvv.setStatus(false);
+                                                      String desc =
+                                                          '${snapshot.data!.data![index].orderType.toString()}(est. ${snapshot.data!.data![index].productVolume.toString()},${snapshot.data!.data![index].persons.toString()} men)';
+                                                      dvv.clear();
+                                                      dvv.setData([
+                                                        snapshot
+                                                            .data!
+                                                            .data![index]
+                                                            .deliveryAddress
+                                                            .toString(),
+                                                        desc.toString(),
+                                                        snapshot.data!
+                                                            .data![index].id
+                                                            .toString(),
+                                                        index.toString(),
+                                                      ]);
+                                                      Navigator
+                                                          .pushReplacementNamed(
+                                                              context,
+                                                              RoutesName
+                                                                  .singleOrder);
+                                                    },
+                                                    child: IntrinsicHeight(
+                                                      child: Row(
+                                                        children: [
+                                                          Container(
+                                                            width: 8,
+                                                            decoration: BoxDecoration(
+                                                                color: selectedIndex ==
+                                                                        index
+                                                                    ? BC.green
+                                                                    : BC.white,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            5)),
+                                                          ),
+                                                          Container(
+                                                            width: width * 0.96,
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        20,
+                                                                    vertical:
+                                                                        5),
+                                                            child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .spaceBetween,
+                                                                    children: [
+                                                                      Text(
+                                                                        snapshot
+                                                                            .data!
+                                                                            .data![index]
+                                                                            .orderId
+                                                                            .toString(),
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontFamily:
+                                                                              "HelveticaRegular",
+                                                                          color:
+                                                                              BC.lightGrey,
+                                                                          fontSize:
+                                                                              width * 0.038,
+                                                                        ),
+                                                                      ),
+                                                                      Container(
+                                                                        padding: const EdgeInsets
+                                                                            .symmetric(
+                                                                            horizontal:
+                                                                                10,
+                                                                            vertical:
+                                                                                5),
+                                                                        decoration: BoxDecoration(
+                                                                            color:
+                                                                                Colors.red,
+                                                                            borderRadius: BorderRadius.circular(15)),
+                                                                        child:
+                                                                            Center(
+                                                                          child:
+                                                                              Text(
+                                                                            'Drop Off',
+                                                                            style:
+                                                                                TextStyle(color: BC.white, fontSize: width * 0.036),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height:
+                                                                        height *
+                                                                            0.01,
+                                                                  ),
+                                                                  Expanded(
+                                                                    child:
+                                                                        Container(
+                                                                      padding: const EdgeInsets
+                                                                          .only(
+                                                                          right:
+                                                                              10),
+                                                                      width: MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .width,
+                                                                      child:
+                                                                          Text(
+                                                                        snapshot
+                                                                            .data!
+                                                                            .data![index]
+                                                                            .deliveryAddress
+                                                                            .toString(),
+                                                                        maxLines:
+                                                                            2,
+                                                                        overflow:
+                                                                            TextOverflow.ellipsis,
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontFamily:
+                                                                              "HelveticaBold",
+                                                                          color:
+                                                                              Colors.black,
+                                                                          fontSize:
+                                                                              width * 0.05,
+                                                                          fontWeight:
+                                                                              FontWeight.w600,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height:
+                                                                        height *
+                                                                            0.01,
+                                                                  ),
+                                                                  Text(
+                                                                    '${snapshot.data!.data![index].orderType.toString()}(est. ${snapshot.data!.data![index].productVolume.toString()} m3,${snapshot.data!.data![index].persons.toString()} men)',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontFamily:
+                                                                          "HelveticaRegular",
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontSize:
+                                                                          width *
+                                                                              0.036,
+                                                                    ),
+                                                                  ),
+                                                                ]),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const Divider(
+                                                    thickness: 2,
+                                                  )
+                                                ],
+                                              )
+                                            ],
+                                          );
+                                        } else {
+                                          return const SizedBox();
+                                        }
+                                      }),
+                                    ),
+                                  ],
+                                )
+                              : const Text('There are no Jobs');
                         }),
                   ],
                 )),

@@ -8,28 +8,27 @@ import '../res/app_url.dart';
 
 class SlugListRepo {
   Future<dynamic> fetchWithPrices(
-      String text, String item, BuildContext context, int id) async {
+      String text,BuildContext context, int id) async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     var jsonResponse;
-    final slugMap = {
-      'ground floor': 'ground',
-      'first floor': 'first',
-      'second floor': 'second',
-      'third floor': 'third',
-      'fourth floor': 'fourth',
-      'fifth floor': 'fifth',
-      'sixth floor': 'sixth',
-    };
-    final destinationFloor = item;
-
-    final currentSlug = text.toLowerCase().split(' ')[0];
-    final destinationSlug = slugMap[destinationFloor.toLowerCase()] ?? '';
-    final slugList = [
-      '$currentSlug\_to\_$destinationSlug',
-      '$destinationSlug\_to\_$currentSlug',
-    ];
-    print(slugList[0]);
-    sp.setString('slug', slugList[0]);
+    // final slugMap = {
+    //   'ground floor': 'ground',
+    //   'first floor': 'first',
+    //   'second floor': 'second',
+    //   'third floor': 'third',
+    //   'fourth floor': 'fourth',
+    //   'fifth floor': 'fifth',
+    //   'sixth floor': 'sixth',
+    // };
+    // final destinationFloor = item;
+    //
+    // final currentSlug = text.toLowerCase().split(' ')[0];
+    // final destinationSlug = slugMap[destinationFloor.toLowerCase()] ?? '';
+    // final slugList = [
+    //   '$currentSlug\_to\_$destinationSlug',
+    //   '$destinationSlug\_to\_$currentSlug',
+    // ];
+    // sp.setString('slug', slugList[0]);
     try {
       var request = http.MultipartRequest(
           'POST', Uri.parse(AppUrl.productPriceApiEndPoint));
@@ -41,9 +40,10 @@ class SlugListRepo {
 
       request.fields['api-key'] = AppUrl.API_key;
       request.fields['login_token'] = sp.get('login_token').toString();
-      request.fields['slug'] = slugList[0];
+      request.fields['slug'] = text;
       request.fields['product_id'] = id.toString();
       var response = await request.send();
+      print(text);
       jsonResponse = json.decode(await response.stream.bytesToString());
       print(jsonResponse);
       return jsonResponse['price']['price'];

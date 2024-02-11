@@ -33,7 +33,7 @@ class HomeRepository {
         return Utilis.error_flushbar_message(context, 'Oops');
       }
     } catch (e) {
-      return Utilis.error_flushbar_message(context, e.toString());
+        throw Exception(e);
     }
 
     // prints "John Doe"// prints "johndoe@example.com"

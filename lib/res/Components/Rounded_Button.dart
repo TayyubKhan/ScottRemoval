@@ -19,40 +19,43 @@ class Rounded_Button extends StatelessWidget {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height * 1;
     double width = MediaQuery.of(context).size.width * 1;
-    return InkWell(
-      onTap: onPress,
-      child: Container(
-          height: height * 0.06,
-          width: width * 0.8,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(35), color: BC.login),
-          child: loading
-              ? const Center(
-                  child: CircularProgressIndicator(
-                    color: BC.white,
-                  ),
-                )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 80),
-                      child: Text(title,
-                          style: const TextStyle(
-                              color: BC.textcolor,
-                              fontFamily: "HelveticaBold")),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: InkWell(
+        onTap: onPress,
+        child: Container(
+            height: height * 0.06,
+            width: width * 0.8,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(35), color: BC.login),
+            child: loading
+                ? const Center(
+                    child: CircularProgressIndicator(
+                      color: BC.white,
                     ),
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Icon(
-                          Icons.login_sharp,
-                          color: Colors.white,
-                        ),
-                      ],
-                    )
-                  ],
-                )),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 80),
+                        child: Text(title,
+                            style: const TextStyle(
+                                color: BC.textcolor,
+                                fontFamily: "HelveticaBold")),
+                      ),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Icon(
+                            Icons.login_sharp,
+                            color: Colors.white,
+                          ),
+                        ],
+                      )
+                    ],
+                  )),
+      ),
     );
   }
 }
@@ -77,7 +80,7 @@ class Rounded_Button2 extends StatelessWidget {
     return InkWell(
       onTap: onPress,
       child: Container(
-          height: height * 0.06,
+          height: height * 0.07,
           width: width * 0.8,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(35), color: BC.login),

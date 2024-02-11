@@ -26,13 +26,10 @@ class _CommentViewState extends State<CommentView> {
     super.initState();
     // TODO: implement initState
     final dataa = Provider.of<DataViewViewModel>(context, listen: false);
-    if (dataa.cmt[dataa.index] != null) {
-      if (dataa.cmt[dataa.index] != '') {
-        _controller = TextEditingController(text: dataa.cmt[dataa.index]);
-      }
+    if (dataa.cmt[dataa.index] != '') {
+      _controller = TextEditingController(text: dataa.cmt[dataa.index]);
     }
-  }
-
+    }
   @override
   Widget build(BuildContext context) {
     final data = Provider.of<DataViewViewModel>(context, listen: true);
@@ -40,7 +37,7 @@ class _CommentViewState extends State<CommentView> {
     var width = MediaQuery.of(context).size.width * 1;
     return WillPopScope(
       onWillPop: () async {
-        Navigator.pushNamed(context, RoutesName.singleOrder);
+        Navigator.pushReplacementNamed(context, RoutesName.singleOrder);
         return false;
       },
       child: Scaffold(
@@ -49,7 +46,7 @@ class _CommentViewState extends State<CommentView> {
           backgroundColor: BC.blue,
           leading: IconButton(
               onPressed: () {
-                Navigator.pushNamed(context, RoutesName.singleOrder);
+                Navigator.pushReplacementNamed(context, RoutesName.singleOrder);
               },
               icon: const Icon(
                 Icons.arrow_back_ios,
@@ -85,6 +82,7 @@ class _CommentViewState extends State<CommentView> {
                 decoration: InputDecoration(
                     hintText: 'Add Comment.....',
                     border: OutlineInputBorder(
+                      borderSide: const BorderSide(color: BC.blue),
                       borderRadius: BorderRadius.circular(10),
                     )),
               ),
@@ -109,13 +107,10 @@ class _CommentViewState extends State<CommentView> {
                                       sp.get('orderId').toString(),
                                       sp.get('user_id').toString(),
                                       sp.getString('driver').toString(),
-                                      _controller.text.toString())
-                                  .onError((error, stackTrace) =>
-                                      Utilis.error_flushbar_message(
-                                          context, error.toString()));
+                                      _controller.text.toString());
                               value.setLoading(false);
                               if (valid == true) {
-                                Navigator.pushNamed(
+                                Navigator.pushReplacementNamed(
                                     context, RoutesName.singleOrder);
                               }
                             } else {

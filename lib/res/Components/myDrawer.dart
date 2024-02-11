@@ -10,6 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../colors.dart';
 
 class MyDrawer extends StatefulWidget {
+  const MyDrawer({super.key});
+
   @override
   State<MyDrawer> createState() => _MyDrawerState();
 }
@@ -77,7 +79,7 @@ class _MyDrawerState extends State<MyDrawer> {
                   ),
                   title: 'My Order',
                   onPressed: () {
-                    Navigator.pushNamed(context, RoutesName.home);
+                    Navigator.pushReplacementNamed(context, RoutesName.home);
                   },
                 ),
                 const SizedBox(
@@ -155,7 +157,7 @@ class _MyDrawerState extends State<MyDrawer> {
                   ),
                   title: 'Send feedback',
                   onPressed: () {
-                    Navigator.pushNamed(context, RoutesName.comment);
+                    Navigator.pushReplacementNamed(context, RoutesName.comment);
                   },
                 ),
                 const SizedBox(
@@ -233,7 +235,7 @@ class _MyDrawerState extends State<MyDrawer> {
                   title: 'Log Out',
                   onPressed: () {
                     user.remove();
-                    Navigator.pushNamed(context, RoutesName.login);
+                    Navigator.pushReplacementNamed(context, RoutesName.login);
                   },
                 ),
                 const SizedBox(

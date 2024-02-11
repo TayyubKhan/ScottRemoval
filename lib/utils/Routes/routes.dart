@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:scotremovals/utils/Routes/routes_name.dart';
 import 'package:scotremovals/view/ItemsandFloorsView.dart';
-import 'package:scotremovals/view/add_Items_view.dart';
 import 'package:scotremovals/view/add_floor_view.dart';
 import 'package:scotremovals/view/add_photo_view.dart';
 import 'package:scotremovals/view/comment_View.dart';
-import 'package:scotremovals/view/extra_itemView.dart';
 import 'package:scotremovals/view/signature_view.dart';
 import 'package:scotremovals/view/waiverForm_View.dart';
-
 import '../../view/Home_Screen.dart';
 import '../../view/Login_screenView.dart';
+import '../../view/add_Items_view.dart';
+import '../../view/extra_itemView.dart';
 import '../../view/order_detail_view.dart';
 import '../../view/splash_view.dart';
 
@@ -37,7 +36,7 @@ class Routes {
             builder: (BuildContext context) => const Waiver_Form_View());
       case RoutesName.addItems:
         return MaterialPageRoute(
-            builder: (BuildContext context) => Add_Items_View());
+            builder: (BuildContext context) => const Add_Items_View());
       case RoutesName.photo:
         return MaterialPageRoute(
             builder: (BuildContext context) => Add_Photo_View());
@@ -49,13 +48,10 @@ class Routes {
             builder: (BuildContext context) => const Signature_View());
       case RoutesName.addFloors:
         return MaterialPageRoute(
-            builder: (BuildContext context) => Add_Floor_View());
+            builder: (BuildContext context) => const Add_Floor_View());
       case RoutesName.extraitem:
         return MaterialPageRoute(
-            builder: (BuildContext context) => Extra_Items_View());
-      case RoutesName.singleOrder:
-        return MaterialPageRoute(
-            builder: (BuildContext context) => Extra_Items_View());
+            builder: (BuildContext context) => const Extra_Items_View());
       default:
         return MaterialPageRoute(builder: (_) {
           return const Scaffold(
