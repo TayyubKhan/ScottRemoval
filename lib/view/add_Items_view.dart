@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:scotremovals/repository/floor_repo.dart';
@@ -145,10 +147,10 @@ class _Add_Items_ViewState extends State<Add_Items_View> {
                         item = [];
                         WidgetsBinding.instance.addPostFrameCallback((_) {
                           for (int k = 0; k < data.dataList.length; k++) {
-                            it.getsavedid(
-                                int.parse(data.dataList[k]['id'].toString()),
-                                data.index);
                             it.saveitem(data.dataList[k]['name'].toString(),
+                                data.index);
+                            it.getsavedid2(
+                                int.parse(data.dataList[k]['id'].toString()),
                                 data.index);
                             it.GetCounter(
                                 k,
@@ -161,52 +163,53 @@ class _Add_Items_ViewState extends State<Add_Items_View> {
                           loading = false;
                           return Consumer<ItemViewViewModel>(
                               builder: (context, ItemModel, child) {
-                                item = snapshot.data['items'];
-                                for (int i = 0;
+                            item = snapshot.data['items'];
+                            for (int i = 0;
                                 i < snapshot.data['items'].length;
                                 i++) {
-                                  ItemModel.getid(int.parse(
-                                      snapshot.data['items'][i]['product_id']));
-                                  ItemModel.getItem(
-                                      snapshot.data['items'][i]['name'].toString(),
-                                      data.index);
-                                }
-                                return DropdownButton(
-                                  focusNode: _focusNode,
-                                  borderRadius: BorderRadius.circular(10),
-                                  isExpanded: true,
-                                  hint: const Text('Search Items'),
-                                  underline: const SizedBox(),
-                                  icon: const Icon(
-                                    Icons.search,
-                                  ),
-                                  value: ItemModel.selectedItem ?? _selectedItem,
-                                  onChanged: (value) {
-                                    if (value != 'Select Item') {
-                                      ItemModel.dropDownIList[data.index]
-                                          .contains(value);
-                                      ItemModel.saveitem(
-                                          value.toString(), data.index);
-                                      for (int i = 0; i < item.length; i++) {
-                                        if (item[i]["name"] == value) {
-                                          ItemModel.getsavedid(
-                                              int.parse(item[i]["product_id"]),
-                                              data.index);
-                                          break; // Stop searching once a match is found
-                                        }
-                                      }
+                              ItemModel.getid(int.parse(
+                                  snapshot.data['items'][i]['product_id']));
+                              ItemModel.getItem(
+                                  snapshot.data['items'][i]['name'].toString(),
+                                  data.index);
+                            }
+
+                            return DropdownButton(
+                              focusNode: _focusNode,
+                              borderRadius: BorderRadius.circular(10),
+                              isExpanded: true,
+                              hint: const Text('Search Items'),
+                              underline: const SizedBox(),
+                              icon: const Icon(
+                                Icons.search,
+                              ),
+                              value: ItemModel.selectedItem ?? _selectedItem,
+                              onChanged: (value) {
+                                if (value != 'Select Item') {
+                                  ItemModel.dropDownIList[data.index]
+                                      .contains(value);
+                                  ItemModel.saveitem(
+                                      value.toString(), data.index);
+                                  for (int i = 0; i < item.length; i++) {
+                                    if (item[i]["name"] == value) {
+                                      ItemModel.getsavedid(
+                                          int.parse(item[i]["product_id"]),
+                                          data.index);
+                                      break; // Stop searching once a match is found
                                     }
-                                    _focusNode.unfocus();
-                                  },
-                                  items: ItemModel.dropDownIList[data.index]
-                                      .map((item) {
-                                    return DropdownMenuItem(
-                                      value: item,
-                                      child: Text(item),
-                                    );
-                                  }).toList(),
+                                  }
+                                }
+                                _focusNode.unfocus();
+                              },
+                              items: ItemModel.dropDownIList[data.index]
+                                  .map((item) {
+                                return DropdownMenuItem(
+                                  value: item,
+                                  child: Text(item),
                                 );
-                              });
+                              }).toList(),
+                            );
+                          });
                         }
                         return DropdownButton(
                           borderRadius: BorderRadius.circular(10),
@@ -240,212 +243,182 @@ class _Add_Items_ViewState extends State<Add_Items_View> {
                 ),
                 loading
                     ? Consumer<ItemViewViewModel>(
-                    builder: (context, value, child) {
-                      return Expanded(
-                        child: ListView.builder(
-                          itemCount: value.savedItem[data.index].length,
-                          itemBuilder: (context, index) {
-                            return Column(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 5),
-                                  decoration: BoxDecoration(
-                                      color: const Color(0xffEBEBEB),
-                                      borderRadius:
-                                      BorderRadius.circular(10)),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      SizedBox(
-                                        width: width * 0.46,
-                                        child: Text(
-                                          value.savedItem[data.index][index],
-                                          style: TextStyle(
-                                              fontSize: width * 0.048,
-                                              fontFamily: "HelveticaRegular",
-                                              color: Colors.black),
-                                        ),
-                                      ),
-                                      Row(
-                                        children: [
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              color: BC.blue,
-                                              borderRadius:
-                                              BorderRadius.circular(30),
-                                            ),
-                                            child: InkWell(
-                                              onTap: () {
-                                                if (value
-                                                    .counters[data.index]
-                                                [index]
-                                                    .value >=
-                                                    2) {
-                                                  value.decerementCounter(
-                                                      index, data.index);
-                                                }
-                                              },
-                                              child: const Icon(
-                                                Icons.remove,
-                                                size: 20,
-                                                color: BC.white,
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          Text(
-                                            value.counters[data.index][index]
-                                                .value
-                                                .toString(),
+                        builder: (context, value, child) {
+                        return Expanded(
+                          child: ListView.builder(
+                            itemCount: value.savedItem[data.index].length,
+                            itemBuilder: (context, index) {
+                              return Column(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 5),
+                                    decoration: BoxDecoration(
+                                        color: const Color(0xffEBEBEB),
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        SizedBox(
+                                          width: width * 0.46,
+                                          child: Text(
+                                            value.savedItem[data.index][index],
                                             style: TextStyle(
-                                                fontFamily:
-                                                "HelveticaRegular",
-                                                fontSize: width * 0.045),
+                                                fontSize: width * 0.048,
+                                                fontFamily: "HelveticaRegular",
+                                                color: Colors.black),
                                           ),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          Container(
+                                        ),
+                                        Row(
+                                          children: [
+                                            Container(
                                               decoration: BoxDecoration(
                                                 color: BC.blue,
                                                 borderRadius:
-                                                BorderRadius.circular(30),
+                                                    BorderRadius.circular(30),
                                               ),
                                               child: InkWell(
                                                 onTap: () {
-                                                  print(value
-                                                      .counters[data.index]
-                                                  [index]
-                                                      .value
-                                                      .toString());
-                                                  value.incrementCounter(
-                                                      index, data.index);
+                                                  if (value
+                                                          .counters[data.index]
+                                                              [index]
+                                                          .value >=
+                                                      2) {
+                                                    value.decerementCounter(
+                                                        index, data.index);
+                                                  }
                                                 },
                                                 child: const Icon(
-                                                  Icons.add,
+                                                  Icons.remove,
                                                   size: 20,
                                                   color: BC.white,
                                                 ),
-                                              ))
-                                        ],
-                                      ),
-                                      IconButton(
-                                          onPressed: () {
-                                            dynamic dataa =
-                                            value.savedItem[data.index];
-                                          },
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text(
+                                              value.counters[data.index][index]
+                                                  .value
+                                                  .toString(),
+                                              style: TextStyle(
+                                                  fontFamily:
+                                                      "HelveticaRegular",
+                                                  fontSize: width * 0.045),
+                                            ),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            Container(
+                                                decoration: BoxDecoration(
+                                                  color: BC.blue,
+                                                  borderRadius:
+                                                      BorderRadius.circular(30),
+                                                ),
+                                                child: InkWell(
+                                                  onTap: () {
+                                                    print(value
+                                                        .counters[data.index]
+                                                            [index]
+                                                        .value
+                                                        .toString());
+                                                    value.incrementCounter(
+                                                        index, data.index);
+                                                  },
+                                                  child: const Icon(
+                                                    Icons.add,
+                                                    size: 20,
+                                                    color: BC.white,
+                                                  ),
+                                                ))
+                                          ],
+                                        ),
+                                        IconButton(
+                                          onPressed: (){},
                                           icon: InkWell(
                                               onTap: () {
                                                 value.removeitem(
                                                     index, data.index);
                                                 it.GetCounter(
                                                     index, data.index, 1);
-                                                it.deleteItemHistory(
-                                                    it.savedItem[data.index]
-                                                    [index]);
+
                                               },
                                               child: const Image(
                                                 height: 20,
                                                 image: AssetImage(
                                                     'assets/delete.png'),
-                                              )))
-                                    ],
+                                              )),
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: height * 0.01,
-                                )
-                              ],
-                            );
-                          },
-                        ),
-                      );
-                    })
+                                  SizedBox(
+                                    height: height * 0.01,
+                                  )
+                                ],
+                              );
+                            },
+                          ),
+                        );
+                      })
                     : const Center(
-                  child: CircularProgressIndicator(
-                    color: BC.blue,
-                  ),
-                ),
+                        child: CircularProgressIndicator(
+                          color: BC.blue,
+                        ),
+                      ),
                 Center(
                   child: Consumer<AuthViewModelProvider>(
                       builder: (context, value, child) {
-                        return Rounded_Button2(
-                            width: width * 0.9,
-                            height: height * 1,
-                            loading: value.loading,
-                            title: "DONE",
-                            onPress: () async {
-                              print(data.dataList);
-                              SharedPreferences sp =
+                    return Rounded_Button2(
+                        width: width * 0.9,
+                        height: height * 1,
+                        loading: value.loading,
+                        title: "DONE",
+                        onPress: () async {
+                          print(data.dataList);
+                          SharedPreferences sp =
                               await SharedPreferences.getInstance();
-                              value.setLoading(true);
-                              if (it.savedItem[data.index].isNotEmpty) {
-                                List<Map<String, dynamic>> updateItem = [];
-                                for (int i = 0; i < item.length; i++) {
-                                  for (int j = 0;
+                          value.setLoading(true);
+                          if (it.savedItem[data.index].isNotEmpty) {
+                            List<Map<String, dynamic>> updateItem = [];
+                            for (int i = 0; i < item.length; i++) {
+                              for (int j = 0;
                                   j < it.savedItem[data.index].length;
                                   j++) {
-                                    if (item[i]["product_id"].toString() ==
-                                        it.savedid[data.index][j].toString()) {
-                                      Map<String, dynamic> itemm = {};
-                                      if (it.orderSentItemsHistory
-                                          .containsKey(data.index)) {
-                                        List<String> sentItemsHistory =
+                                if (item[i]["product_id"].toString() ==
+                                    it.savedid[data.index][j].toString()) {
+                                  Map<String, dynamic> itemm = {};
+                                  if (it.orderSentItemsHistory
+                                      .containsKey(data.index)) {
+                                    List<String> sentItemsHistory =
                                         it.orderSentItemsHistory[data.index]!;
-                                        String name = it.savedItem[data.index][j];
-                                        int quantity =
-                                            it.counters[data.index][j].value;
-                                        int index = sentItemsHistory.indexWhere(
-                                                (element) =>
-                                                element.startsWith('$name:'));
-                                        if (index != -1) {
-                                          int historyQuantity = int.parse(
-                                              sentItemsHistory[index]
-                                                  .split(':')[1]);
-                                          if (historyQuantity < quantity) {
-                                            int extraQuantity =
-                                                quantity - historyQuantity;
-                                            itemm = {
-                                              'name': name,
-                                              'quantity': extraQuantity.toString(),
-                                              "id": item[i]["product_id"],
-                                              "tab": "Living",
-                                              "type": "house_removal",
-                                              "parent": "498",
-                                              "parent_name": ""
-                                            };
-                                          } else if (historyQuantity == quantity) {
-                                            itemm = {};
-                                          } else {
-                                            itemm = {
-                                              'name': it.savedItem[data.index][j],
-                                              'quantity': it
-                                                  .counters[data.index][j].value
-                                                  .toString(),
-                                              "id": item[i]["product_id"],
-                                              "tab": "Living",
-                                              "type": "house_removal",
-                                              "parent": "498",
-                                              "parent_name": ""
-                                            };
-                                          }
-                                        } else {
-                                          itemm = {
-                                            'name': it.savedItem[data.index][j],
-                                            'quantity': it
-                                                .counters[data.index][j].value
-                                                .toString(),
-                                            "id": item[i]["product_id"],
-                                            "tab": "Living",
-                                            "type": "house_removal",
-                                            "parent": "498",
-                                            "parent_name": ""
-                                          };
-                                        }
+                                    String name = it.savedItem[data.index][j];
+                                    int quantity =
+                                        it.counters[data.index][j].value;
+                                    int index = sentItemsHistory.indexWhere(
+                                        (element) =>
+                                            element.startsWith('$name:'));
+                                    if (index != -1) {
+                                      int historyQuantity = int.parse(
+                                          sentItemsHistory[index]
+                                              .split(':')[1]);
+                                      if (historyQuantity < quantity) {
+                                        int extraQuantity =
+                                            quantity - historyQuantity;
+                                        itemm = {
+                                          'name': name,
+                                          'quantity': extraQuantity.toString(),
+                                          "id": item[i]["product_id"],
+                                          "tab": "Living",
+                                          "type": "house_removal",
+                                          "parent": "498",
+                                          "parent_name": ""
+                                        };
+                                      } else if (historyQuantity == quantity) {
+                                        itemm = {};
                                       } else {
                                         itemm = {
                                           'name': it.savedItem[data.index][j],
@@ -459,26 +432,51 @@ class _Add_Items_ViewState extends State<Add_Items_View> {
                                           "parent_name": ""
                                         };
                                       }
-                                      updateItem.add(itemm);
+                                    } else {
+                                      itemm = {
+                                        'name': it.savedItem[data.index][j],
+                                        'quantity': it
+                                            .counters[data.index][j].value
+                                            .toString(),
+                                        "id": item[i]["product_id"],
+                                        "tab": "Living",
+                                        "type": "house_removal",
+                                        "parent": "498",
+                                        "parent_name": ""
+                                      };
                                     }
-                                    // Stop searching once a match is found
+                                  } else {
+                                    itemm = {
+                                      'name': it.savedItem[data.index][j],
+                                      'quantity': it
+                                          .counters[data.index][j].value
+                                          .toString(),
+                                      "id": item[i]["product_id"],
+                                      "tab": "Living",
+                                      "type": "house_removal",
+                                      "parent": "498",
+                                      "parent_name": ""
+                                    };
                                   }
+                                  updateItem.add(itemm);
                                 }
-                                it.addlist(data.index);
-
-                                value.setLoading(true);
-                                await up.UpdateItemAPI(context,
-                                    sp.get('orderId').toString(), updateItem);
-                                value.setLoading(false);
-                                Navigator.pushReplacementNamed(
-                                    context, RoutesName.singleOrder);
-                                Utilis.submitted_flushbar_message(
-                                    context, 'Success');
-                              } else {
-                                Utilis.error_flushbar_message(context, 'Error');
+                                // Stop searching once a match is found
                               }
-                            });
-                      }),
+                            }
+                            it.addlist(data.index);
+                            value.setLoading(true);
+                            await up.UpdateItemAPI(context,
+                                sp.get('orderId').toString(), updateItem);
+                            value.setLoading(false);
+                            Navigator.pushReplacementNamed(
+                                context, RoutesName.singleOrder);
+                            Utilis.submitted_flushbar_message(
+                                context, 'Success');
+                          } else {
+                            Utilis.error_flushbar_message(context, 'Error');
+                          }
+                        });
+                  }),
                 ),
                 const SizedBox(height: 20),
               ],

@@ -23,6 +23,7 @@ class Photo_Component extends StatelessWidget {
           ),
           Text(
             'Take Image',
+            overflow: TextOverflow.fade,
             style: TextStyle(
                 fontFamily: "HelveticaRegular", fontSize: width * 0.048),
           ),

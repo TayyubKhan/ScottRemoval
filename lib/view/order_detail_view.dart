@@ -214,7 +214,7 @@ class _Order_DetailState extends State<Order_Detail> {
                                           await _controller.future;
                                       // Zoom out by a factor (you can adjust the value as needed)
                                       googleController.animateCamera(
-                                        CameraUpdate.zoomBy(-1.0),
+                                        CameraUpdate.zoomBy(1.0),
                                       );
                                     },
                                     child: const CircleAvatar(

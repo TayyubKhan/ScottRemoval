@@ -277,10 +277,17 @@ class ItemViewViewModel with ChangeNotifier {
 
   void getsavedid(int Id, int index) {
     if (_savedid[index].contains(Id)) {
-    } else {
+    } else
+    {
       _savedid[index].add(Id);
       notifyListeners();
     }
+  }
+  void getsavedid2(int Id, int index) {
+
+      _savedid[index].add(Id);
+      notifyListeners();
+
   }
 
   String? SelectedFloor(value) {
@@ -330,7 +337,6 @@ class ItemViewViewModel with ChangeNotifier {
 
   void saveitem(String item, index) {
     if (item == 'Select Item' || _savedItem[index].contains(item)) {
-
     } else {
       _savedItem[index].add(item);
       _savedItem[index].reversed;
@@ -343,18 +349,17 @@ class ItemViewViewModel with ChangeNotifier {
   //   notifyListeners();
   //   return _savedItem;
   // }
-  List<String> removeitem(int index, int index1) {
+  void removeitem(int index, int index1) {
     _savedItem[index1].removeAt(index);
     _savedid[index1].removeAt(index);
     notifyListeners();
-    return _savedItem[index1];
   }
 
   void removeItem() {
     _dropDownIList = [];
   }
 
-  void GetCounter(int index, index1,value) {
+  void GetCounter(int index, index1, value) {
     counters[index1][index].getCounter(value);
     notifyListeners();
   }
