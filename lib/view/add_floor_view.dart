@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:scotremovals/utils/Routes/routes_name.dart';
 import 'package:scotremovals/view_model/AdditemsViewVIewModel.dart';
 import 'package:scotremovals/view_model/ExtraItemFloorViewModel.dart';
+import 'package:scotremovals/view_model/FloorViewVIewModel.dart';
 import 'package:scotremovals/view_model/auth_view_model.dart';
 import 'package:scotremovals/view_model/dataViewModel.dart';
 
@@ -120,33 +121,54 @@ class _Add_Floor_ViewState extends State<Add_Floor_View> {
                 }
                 floor = data.location[data.index]['slug']!;
                 List<String> floors = floor.split('_to_');
-                String initialFloor = floors.isNotEmpty ? floors.last : 'Select floor';
-                 _itemValue = slugMap[initialFloor] ?? 'Select floor';
+                String initialFloor =
+                    floors.isNotEmpty ? floors.last : 'Select floor';
+                _itemValue = slugMap[initialFloor] ?? 'Select floor';
                 return Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: BC.lightGrey),
                   ),
-                  child: DropdownButton(
-                      borderRadius: BorderRadius.circular(10),
-                      isExpanded: true,
-                      hint: const Text('Floors'),
-                      underline: const SizedBox(),
-                      icon: const Icon(
-                        Icons.keyboard_arrow_down,
-                      ),
-                      value: _itemValue,
-                      onChanged: (value) async {
-                        data.removeprice();
-                        setState(() {
-                          _itemValue = value!;
-                        });
-                      },
-                      items: itemList.map((value) {
-                        return DropdownMenuItem(
-                            value: value, child: Text(value));
-                      }).toList()),
+                  child: Consumer<FloorModel>(builder: (context, v, _) {
+                    return DropdownButton(
+                        borderRadius: BorderRadius.circular(10),
+                        isExpanded: true,
+                        hint: const Text('Floors'),
+                        underline: const SizedBox(),
+                        icon: const Icon(
+                          Icons.keyboard_arrow_down,
+                        ),
+                        value: v.selectedFloor ?? _itemValue,
+                        onChanged: (value) async {
+                          data.removeprice();
+                          v.selectFloor(value!);
+                          String finalFloor =
+                              floors.isNotEmpty ? floors.first : 'Select floor';
+                          _itemValue = slugMap[finalFloor] ?? 'Select floor';
+                          final slug = slugList(v.selectedFloor!);
+                          for (int i = 0;
+                              i < data.ids[data.index].length;
+                              i++) {
+                            slugListRepo
+                                .fetchWithPrices(
+                                    '${finalFloor}_to_$slug',
+                                    context,
+                                    int.parse(data.ids[data.index][i]['id']
+                                        .toString()))
+                                .then((value) {
+                              if (value != null &&
+                                  value != 'No_product_item_found') {
+                                data.getPrice(double.parse(value.toString()));
+                              }
+                            });
+                          }
+                        },
+                        items: itemList.map((value) {
+                          return DropdownMenuItem(
+                              value: value, child: Text(value));
+                        }).toList());
+                  }),
                 );
               }),
               Row(
@@ -200,8 +222,8 @@ class _Add_Floor_ViewState extends State<Add_Floor_View> {
                       height: height * 1,
                       title: "DONE",
                       onPress: () async {
-                          Navigator.pushReplacementNamed(
-                              context, RoutesName.singleOrder);
+                        Navigator.pushReplacementNamed(
+                            context, RoutesName.singleOrder);
 
                         // Navigator.pushReplacementNamed(context, RoutesName.waiverForm);
                       });
@@ -213,6 +235,21 @@ class _Add_Floor_ViewState extends State<Add_Floor_View> {
         ),
       ),
     );
+  }
+
+  String slugList(String item) {
+    final slugMap = {
+      'ground floor': 'ground',
+      'first floor': 'first',
+      'second floor': 'second',
+      'third floor': 'third',
+      'fourth floor': 'fourth',
+      'fifth floor': 'fifth',
+      'sixth floor': 'sixth',
+    };
+    final destinationFloor = item;
+    final destinationSlug = slugMap[destinationFloor.toLowerCase()] ?? '';
+    return destinationSlug;
   }
 }
 

@@ -70,7 +70,6 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
     final it = Provider.of<ExtraItemViewViewModel>(context);
     var height = MediaQuery.of(context).size.height * 1;
     var width = MediaQuery.of(context).size.width * 1;
-
     return WillPopScope(
       onWillPop: () async {
         Navigator.pushReplacementNamed(context, RoutesName.singleOrder);
@@ -301,8 +300,8 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                                                                           .value >=
                                                                       2) {
                                                                     value.decrementDCounter(
-                                                                        index,
-                                                                        data.index);
+                                                                        data.index,
+                                                                        index);
                                                                   }
                                                                 },
                                                                 child:
@@ -347,8 +346,8 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                                                                 child: InkWell(
                                                                   onTap: () {
                                                                     value.incrementDCounter(
-                                                                        index,
-                                                                        data.index);
+                                                                        data.index,
+                                                                        index);
                                                                   },
                                                                   child:
                                                                       const Icon(
@@ -592,8 +591,8 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                                                                           .value >=
                                                                       2) {
                                                                     value.decrementCounter(
-                                                                        index,
-                                                                        data.index);
+                                                                        data.index,
+                                                                        index);
                                                                   }
                                                                 },
                                                                 child:
@@ -638,8 +637,8 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                                                                 child: InkWell(
                                                                   onTap: () {
                                                                     value.incrementCounter(
-                                                                        index,
-                                                                        data.index);
+                                                                        data.index,
+                                                                        index);
                                                                   },
                                                                   child:
                                                                       const Icon(
@@ -880,8 +879,8 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                                                                           .value >=
                                                                       2) {
                                                                     value.decrementPCounter(
-                                                                        index,
-                                                                        data.index);
+                                                                        data.index,
+                                                                        index);
                                                                   }
                                                                 },
                                                                 child:
@@ -926,8 +925,8 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                                                                 child: InkWell(
                                                                   onTap: () {
                                                                     value.incrementPCounter(
-                                                                        index,
-                                                                        data.index);
+                                                                        data.index,
+                                                                        index);
                                                                   },
                                                                   child:
                                                                       const Icon(
@@ -1123,28 +1122,11 @@ class _Extra_Items_ViewState extends State<Extra_Items_View> {
                             updateItem.addAll(data.dataList);
                             it.addlist(data.index);
                             print(updateItem);
-                            it.storeSentItemsHistoryForOrder(
-                                // int.parse(sp.get('orderId').toString()),
-                                data.index,
-                                it.dsavedItem[data.index],
-                                it.Dcounters[data.index],
-                                "Dismantling Service");
-                            it.storeSentItemsHistoryForOrder(
-                                // int.parse(sp.get('orderId').toString()),
-                                data.index,
-                                it.psavedItem[data.index],
-                                it.pcounters[data.index],
-                                "Packing Service");
-                            it.storeSentItemsHistoryForOrder(
-                                data.index,
-                                // 1,
-                                it.rsavedItem[data.index],
-                                it.counters[data.index],
-                                "Reassembly Service");
                             value.setLoading(true);
                             up.UpdateItemAPI(context,
                                     sp.get('orderId').toString(), updateItem)
                                 .then((_) {
+
                               value.setLoading(false);
                               Navigator.pushReplacementNamed(
                                   context, RoutesName.singleOrder);

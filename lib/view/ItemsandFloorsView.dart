@@ -118,6 +118,7 @@ class ItemsAndFloorView extends StatelessWidget {
                     InkWell(
                       onTap: () {
                         Navigator.pushReplacementNamed(context, RoutesName.extraitem);
+
                       },
                       child: const CircleAvatar(
                         backgroundColor: BC.login,
